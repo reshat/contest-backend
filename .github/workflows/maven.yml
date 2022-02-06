@@ -37,7 +37,7 @@ jobs:
         cache: maven
     - name: Build with Maven
       id: build
-      run: mvn -B package --file pom.xml
+      run: mvn -B -Dmaven.test.skip package --file pom.xml
     - name: Docker image build and push
       if: steps.build.outcome == 'success'
       uses: mr-smithers-excellent/docker-build-push@v5
