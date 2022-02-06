@@ -17,23 +17,35 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.Set;
 
 import static java.util.Arrays.stream;
 @Slf4j
 public class CustomAuthorizationFilter extends OncePerRequestFilter {
+    private final String[] tokenExceptions = {
+            "api-docs",
+            "configuration",
+            "swagger-resources",
+            "configuration",
+            "swagger-ui.html",
+            "webjars"
+    };
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-        if(request.getServletPath().equals("/login")) {
-            log.info("inside login");
+        if(request.getServletPath().equals("/login")
+                || Arrays.stream(tokenExceptions).anyMatch(request.getServletPath()::contains)) {
+            log.info("inside exception");
+            log.info(request.getServletPath());
             filterChain.doFilter(request,response);
         } else {
             log.info("auth start");
+            log.info(request.getServletPath());
 
             String authorizationHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
-            log.info(authorizationHeader);
+            log.info("authentication header is present " + String.valueOf(authorizationHeader != null));
             if(authorizationHeader != null) {
-                log.info("header present");
                 try {
                     Algorithm algorithm = Algorithm.HMAC256("secret".getBytes());
                     JWTVerifier verifier = JWT.require(algorithm).build();
