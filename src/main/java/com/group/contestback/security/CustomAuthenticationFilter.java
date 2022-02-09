@@ -31,7 +31,7 @@ public class CustomAuthenticationFilter extends UsernamePasswordAuthenticationFi
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException {
         String username = request.getParameter("username");
         String password = request.getParameter("password");
-        log.info("Authenticated");
+        log.info("Attempt for authentication for username " + username);
         UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(username, password);
         return authenticationManager.authenticate(authenticationToken);
     }
@@ -42,16 +42,19 @@ public class CustomAuthenticationFilter extends UsernamePasswordAuthenticationFi
         Algorithm algorithm = Algorithm.HMAC256("secret".getBytes());
         String access_token = JWT.create()
                 .withSubject(user.getUsername())
-                .withExpiresAt(new Date(System.currentTimeMillis() + 10*60*1000))
+                .withExpiresAt(new Date(System.currentTimeMillis() + 15*60*1000))
                 .withIssuer(request.getRequestURI().toString())
                 .withClaim("roles", user.getAuthorities().stream().map(GrantedAuthority::getAuthority).collect(Collectors.toList()))
                 .sign(algorithm);
-//        String refresh_token = JWT.create()
-//                .withSubject(user.getUsername())
-//                .withExpiresAt(new Date(System.currentTimeMillis() + 50*60*1000))
-//                .withIssuer(request.getRequestURI().toString())
-//                .sign(algorithm);
         response.setHeader("access_token", access_token);
-//        response.setHeader("refresh_token", refresh_token);
+        log.info("Successful authentication for user " + authResult.getName());
+    }
+
+    @Override
+    protected void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response, AuthenticationException failed) throws IOException, ServletException {
+        response.setHeader("error",failed.getMessage());
+        response.sendError(HttpServletResponse.SC_UNAUTHORIZED);
+        log.info("Unsuccessful authentication: " + failed.getMessage());
+        //super.unsuccessfulAuthentication(request, response, failed);
     }
 }

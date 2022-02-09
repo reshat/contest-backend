@@ -40,8 +40,6 @@ public class CustomAuthorizationFilter extends OncePerRequestFilter {
             log.info(request.getServletPath());
             filterChain.doFilter(request,response);
         } else {
-            log.info("auth start");
-            log.info(request.getServletPath());
 
             String authorizationHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
             log.info("authentication header is present " + String.valueOf(authorizationHeader != null));
@@ -51,6 +49,8 @@ public class CustomAuthorizationFilter extends OncePerRequestFilter {
                     JWTVerifier verifier = JWT.require(algorithm).build();
                     DecodedJWT decodedJWT = verifier.verify(authorizationHeader);
                     String username = decodedJWT.getSubject();
+                    log.info("user " + username + " tries to access " + request.getServletPath());
+
                     String[] roles = decodedJWT.getClaim("roles").asArray(String.class);
                     Collection<SimpleGrantedAuthority> authorities = new ArrayList<>();
                     stream(roles).forEach(role->{
@@ -63,11 +63,14 @@ public class CustomAuthorizationFilter extends OncePerRequestFilter {
 
                 } catch (Exception e) {
                     response.setHeader("error",e.getMessage());
+                    log.error("exception: " + e.getMessage());
+
                     response.sendError(HttpServletResponse.SC_FORBIDDEN);
                 }
             } else {
                 response.setHeader("error","no authentication provided");
                 response.sendError(HttpServletResponse.SC_FORBIDDEN);
+                log.error("no authentication provided");
                 filterChain.doFilter(request,response);
             }
         }
