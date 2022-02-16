@@ -3,12 +3,15 @@ package com.group.contestback.controllers;
 import com.group.contestback.models.AppUser;
 import com.group.contestback.models.Role;
 import com.group.contestback.services.AppUserService;
+import com.group.contestback.services.EmailServiceCS;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.SwaggerDefinition;
 import io.swagger.annotations.Tag;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,14 +22,16 @@ import java.util.List;
 @RequiredArgsConstructor
 @RequestMapping("/api")
 @CrossOrigin(origins = "*", allowedHeaders = "*")
-
+@Slf4j
 public class UserController {
     private final AppUserService userService;
-
+    @Autowired
+    private EmailServiceCS emailServiceCS;
 
     @ApiOperation(value = "Возращает всех пользователей")
     @GetMapping("/users")
     public ResponseEntity<List<AppUser>> getUsers() {
+        log.info("sending email");
         return ResponseEntity.ok().body(userService.getUsers());
     }
     @ApiOperation(value = "Добавляет нового пользователя", notes = "Роли указывать необязательно, для этого существует другой запрос")
@@ -44,6 +49,11 @@ public class UserController {
     public ResponseEntity<?> addRoleToUser(@RequestBody RoleToUserForm form) {
         userService.addRoleToUser(form.getUsername(), form.getRolename());
         return ResponseEntity.ok().build();
+    }
+    @ApiOperation(value = "Отправка тестового собщения на почту разработчика")
+    @PostMapping("/user/sendmail")
+    public void sendMail() {
+        emailServiceCS.sendSimpleMessage("reshat.sultan@yandex.ru","subj","test");
     }
 }
 @Data
