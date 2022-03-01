@@ -11,4 +11,5 @@ public interface AppUserService {
     void addRoleToUser(String username, String role);
     AppUser getAppUser(String username);
     List<AppUser> getUsers();
+    void addEmailToUser(String username, String email);
 }

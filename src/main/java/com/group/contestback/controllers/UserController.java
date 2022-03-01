@@ -55,9 +55,20 @@ public class UserController {
     public void sendMail() {
         emailServiceCS.sendSimpleMessage("reshat.sultan@yandex.ru","subj","test");
     }
+    @ApiOperation(value = "Добавляет роль к пользователю")
+    @PostMapping("/user/addEmail")
+    public ResponseEntity<?> addEmailToUser(@RequestBody EmailToUserForm form) {
+        userService.addEmailToUser(form.getUsername(), form.getEmail());
+        return ResponseEntity.ok().build();
+    }
 }
 @Data
 class RoleToUserForm {
     private String username;
     private String rolename;
+}
+@Data
+class EmailToUserForm {
+    private String username;
+    private String email;
 }

@@ -26,9 +26,9 @@ public class ContestBackApplication {
                 userService.saveRole(new Role(null, "ROLE_USER"));
                 userService.saveRole(new Role(null, "ROLE_ADMIN"));
 
-                userService.saveAppUser(new AppUser(null, "Ivan","ivan","1234", new ArrayList<>()));
-                userService.saveAppUser(new AppUser(null, "Polina","polina","1234", new ArrayList<>()));
-                userService.saveAppUser(new AppUser(null, "Andrei","andrei","1234", new ArrayList<>()));
+                userService.saveAppUser(new AppUser(null, "Ivan","ivan","1234", "reshat.sultan@yandex.ru", new ArrayList<>()));
+                userService.saveAppUser(new AppUser(null, "Polina","polina","1234", "reshat@yandex.ru", new ArrayList<>()));
+                userService.saveAppUser(new AppUser(null, "Andrei","andrei","1234", "sultan@yandex.ru", new ArrayList<>()));
 
                 userService.addRoleToUser("ivan","ROLE_USER");
                 userService.addRoleToUser("polina","ROLE_ADMIN");

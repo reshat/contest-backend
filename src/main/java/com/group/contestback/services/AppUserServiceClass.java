@@ -57,6 +57,12 @@ public class AppUserServiceClass implements AppUserService, UserDetailsService {
     }
 
     @Override
+    public void addEmailToUser(String username, String email) {
+        AppUser user = userRepo.findByUsername(username);
+        user.setEmail(email);
+    }
+
+    @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         AppUser user = userRepo.findByUsername(username);
         if(user == null) {
@@ -64,9 +70,7 @@ public class AppUserServiceClass implements AppUserService, UserDetailsService {
             throw new UsernameNotFoundException("user not found");
         }
         Collection<SimpleGrantedAuthority> authorities = new ArrayList<>();
-        user.getRoles().forEach(role->{
-            authorities.add(new SimpleGrantedAuthority(role.getName()));
-        });
+        user.getRoles().forEach(role-> authorities.add(new SimpleGrantedAuthority(role.getName())));
         return new User(user.getUsername(), user.getPassword(), authorities);
     }
 }
