@@ -31,7 +31,6 @@ public class UserController {
     @ApiOperation(value = "Возращает всех пользователей")
     @GetMapping("/users")
     public ResponseEntity<List<AppUser>> getUsers() {
-        log.info("sending email");
         return ResponseEntity.ok().body(userService.getUsers());
     }
     @ApiOperation(value = "Добавляет нового пользователя", notes = "Роли указывать необязательно, для этого существует другой запрос")
@@ -55,7 +54,7 @@ public class UserController {
     public void sendMail() {
         emailServiceCS.sendSimpleMessage("reshat.sultan@yandex.ru","subj","test");
     }
-    @ApiOperation(value = "Добавляет роль к пользователю")
+    @ApiOperation(value = "Добавляет почту к пользователю")
     @PostMapping("/user/addEmail")
     public ResponseEntity<?> addEmailToUser(@RequestBody EmailToUserForm form) {
         userService.addEmailToUser(form.getUsername(), form.getEmail());

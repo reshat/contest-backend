@@ -6,6 +6,7 @@ import com.group.contestback.repositories.AppUserRepo;
 import com.group.contestback.repositories.RoleRepo;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -24,9 +25,13 @@ public class AppUserServiceClass implements AppUserService, UserDetailsService {
     private final AppUserRepo userRepo;
     private final RoleRepo roleRepo;
     private final PasswordEncoder passwordEncoder;
+    @Autowired
+    private EmailServiceCS emailServiceCS;
     @Override
     public AppUser saveAppUser(AppUser user) {
         user.setPassword(passwordEncoder.encode(user.getPassword()));
+        log.info("Registering new user" + user.getUsername() + " " + user.getEmail());
+        emailServiceCS.sendSimpleMessage(user.getEmail(),"Регистрация","Вы были успешно зарегистрированы");
         return userRepo.save(user);
     }
 
@@ -41,8 +46,10 @@ public class AppUserServiceClass implements AppUserService, UserDetailsService {
         Role role = roleRepo.findByName(roleName);
         Collection<Role> roles = user.getRoles();
         if(!roles.contains(role)) {
-            log.info("role is already present");
             user.getRoles().add(role);
+            emailServiceCS.sendSimpleMessage(user.getEmail(),"Добавление роли","Вам была присвоена роль " + roleName);
+        } else {
+            log.info("role is already present");
         }
     }
 
@@ -59,7 +66,9 @@ public class AppUserServiceClass implements AppUserService, UserDetailsService {
     @Override
     public void addEmailToUser(String username, String email) {
         AppUser user = userRepo.findByUsername(username);
+        emailServiceCS.sendSimpleMessage(user.getEmail(),"Изменение почты","Ваша почта была изменена на " + email);
         user.setEmail(email);
+        emailServiceCS.sendSimpleMessage(user.getEmail(),"Изменение почты","Ваша почта была изменена на " + email);
     }
 
     @Override
