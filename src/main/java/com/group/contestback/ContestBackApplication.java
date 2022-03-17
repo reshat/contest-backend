@@ -1,7 +1,6 @@
 package com.group.contestback;
 
 import com.group.contestback.models.AppUser;
-import com.group.contestback.models.Role;
 import com.group.contestback.services.AppUserService;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
@@ -10,7 +9,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-import java.util.ArrayList;
 
 @SpringBootApplication
 public class ContestBackApplication {
@@ -23,16 +21,12 @@ public class ContestBackApplication {
     CommandLineRunner run(AppUserService userService) {
         return args -> {
             if(userService.getUsers().size() == 0) {
-                userService.saveRole(new Role(null, "ROLE_USER"));
-                userService.saveRole(new Role(null, "ROLE_ADMIN"));
-
-                userService.saveAppUser(new AppUser(null, "Ivan","ivan","1234", "reshat.sultan@yandex.ru", new ArrayList<>()));
-                userService.saveAppUser(new AppUser(null, "Polina","polina","1234", "reshat@yandex.ru", new ArrayList<>()));
-                userService.saveAppUser(new AppUser(null, "Andrei","andrei","1234", "sultan@yandex.ru", new ArrayList<>()));
-
-                userService.addRoleToUser("ivan","ROLE_USER");
-                userService.addRoleToUser("polina","ROLE_ADMIN");
+                AppUser user = new AppUser(1, "Ivan","ivan","ivanovich",
+                        "ivanLogin", "", "", "reshat.sultan@yandex.ru",1 );
+                userService.saveAppUser(user);
+                userService.addRoleToUser(user.getLogin(),"ROLE_USER", "NONE");
             }
+
         };
     }
     @Bean

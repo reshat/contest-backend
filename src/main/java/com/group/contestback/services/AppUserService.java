@@ -1,15 +1,14 @@
 package com.group.contestback.services;
 
 import com.group.contestback.models.AppUser;
-import com.group.contestback.models.Role;
+import com.group.contestback.models.Roles;
 
 import java.util.List;
 
 public interface AppUserService {
     AppUser saveAppUser(AppUser user);
-    Role saveRole(Role role);
-    void addRoleToUser(String username, String role);
-    AppUser getAppUser(String username);
+    void addRoleToUser(String login, String roleName, String description);
+    AppUser getAppUser(String login);
     List<AppUser> getUsers();
-    void addEmailToUser(String username, String email);
+    void addEmailToUser(String login, String email);
 }

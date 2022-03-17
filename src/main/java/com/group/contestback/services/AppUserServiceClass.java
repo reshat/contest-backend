@@ -1,9 +1,9 @@
 package com.group.contestback.services;
 
 import com.group.contestback.models.AppUser;
-import com.group.contestback.models.Role;
+import com.group.contestback.models.Roles;
 import com.group.contestback.repositories.AppUserRepo;
-import com.group.contestback.repositories.RoleRepo;
+import com.group.contestback.repositories.RolesRepo;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,39 +23,32 @@ import java.util.List;
 @Service @RequiredArgsConstructor @Transactional @Slf4j
 public class AppUserServiceClass implements AppUserService, UserDetailsService {
     private final AppUserRepo userRepo;
-    private final RoleRepo roleRepo;
+    private final RolesRepo rolesRepo;
     private final PasswordEncoder passwordEncoder;
     @Autowired
     private EmailServiceCS emailServiceCS;
     @Override
     public AppUser saveAppUser(AppUser user) {
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
-        log.info("Registering new user" + user.getUsername() + " " + user.getEmail());
+        user.setPassHash(passwordEncoder.encode(user.getPassHash()));
+        log.info("Registering new user" + user.getLogin() + " " + user.getEmail());
         emailServiceCS.sendSimpleMessage(user.getEmail(),"Регистрация","Вы были успешно зарегистрированы");
         return userRepo.save(user);
     }
 
     @Override
-    public Role saveRole(Role role) {
-        return roleRepo.save(role);
-    }
-
-    @Override
-    public void addRoleToUser(String username, String roleName) {
-        AppUser user = userRepo.findByUsername(username);
-        Role role = roleRepo.findByName(roleName);
-        Collection<Role> roles = user.getRoles();
-        if(!roles.contains(role)) {
-            user.getRoles().add(role);
-            emailServiceCS.sendSimpleMessage(user.getEmail(),"Добавление роли","Вам была присвоена роль " + roleName);
+    public void addRoleToUser(String login, String roleName, String description) {
+        AppUser user = userRepo.findByLogin(login);
+        if(user != null){
+            Roles roles = new Roles(user.getRoleId(), roleName, description);
+            rolesRepo.save(roles);
         } else {
-            log.info("role is already present");
+            log.info("user no found");
         }
     }
 
     @Override
-    public AppUser getAppUser(String username) {
-        return userRepo.findByUsername(username);
+    public AppUser getAppUser(String login) {
+        return userRepo.findByLogin(login);
     }
 
     @Override
@@ -64,22 +57,22 @@ public class AppUserServiceClass implements AppUserService, UserDetailsService {
     }
 
     @Override
-    public void addEmailToUser(String username, String email) {
-        AppUser user = userRepo.findByUsername(username);
+    public void addEmailToUser(String login, String email) {
+        AppUser user = userRepo.findByLogin(login);
         emailServiceCS.sendSimpleMessage(user.getEmail(),"Изменение почты","Ваша почта была изменена на " + email);
         user.setEmail(email);
         emailServiceCS.sendSimpleMessage(user.getEmail(),"Изменение почты","Ваша почта была изменена на " + email);
     }
 
     @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        AppUser user = userRepo.findByUsername(username);
+    public UserDetails loadUserByUsername(String login) throws UsernameNotFoundException {
+        AppUser user = userRepo.findByLogin(login);
         if(user == null) {
             log.error("user not found");
             throw new UsernameNotFoundException("user not found");
         }
         Collection<SimpleGrantedAuthority> authorities = new ArrayList<>();
-        user.getRoles().forEach(role-> authorities.add(new SimpleGrantedAuthority(role.getName())));
-        return new User(user.getUsername(), user.getPassword(), authorities);
+        rolesRepo.findAllById(user.getRoleId()).forEach(role-> authorities.add(new SimpleGrantedAuthority(role.getName())));
+        return new User(user.getLogin(), user.getPassHash(), authorities);
     }
 }

@@ -1,7 +1,6 @@
 package com.group.contestback.controllers;
 
 import com.group.contestback.models.AppUser;
-import com.group.contestback.models.Role;
 import com.group.contestback.services.AppUserService;
 import com.group.contestback.services.EmailServiceCS;
 import io.swagger.annotations.Api;
@@ -38,15 +37,10 @@ public class UserController {
     public ResponseEntity<AppUser> addUsers(@RequestBody AppUser user) {
         return ResponseEntity.ok().body(userService.saveAppUser(user));
     }
-    @ApiOperation(value = "Добавляет новую роль")
-    @PostMapping("/role/add")
-    public ResponseEntity<Role> addUsers(@RequestBody Role role) {
-        return ResponseEntity.ok().body(userService.saveRole(role));
-    }
     @ApiOperation(value = "Добавляет роль к пользователю")
     @PostMapping("/user/addrole")
     public ResponseEntity<?> addRoleToUser(@RequestBody RoleToUserForm form) {
-        userService.addRoleToUser(form.getUsername(), form.getRolename());
+        userService.addRoleToUser(form.getLogin(), form.getRoleName(), form.getDescription());
         return ResponseEntity.ok().build();
     }
     @ApiOperation(value = "Отправка тестового собщения на почту разработчика")
@@ -57,17 +51,18 @@ public class UserController {
     @ApiOperation(value = "Добавляет почту к пользователю")
     @PostMapping("/user/addEmail")
     public ResponseEntity<?> addEmailToUser(@RequestBody EmailToUserForm form) {
-        userService.addEmailToUser(form.getUsername(), form.getEmail());
+        userService.addEmailToUser(form.getLogin(), form.getEmail());
         return ResponseEntity.ok().build();
     }
 }
 @Data
 class RoleToUserForm {
-    private String username;
-    private String rolename;
+    private String login;
+    private String roleName;
+    private String description;
 }
 @Data
 class EmailToUserForm {
-    private String username;
+    private String login;
     private String email;
 }

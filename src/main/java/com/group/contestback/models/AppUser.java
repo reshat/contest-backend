@@ -13,12 +13,14 @@ import java.util.Collection;
 @NoArgsConstructor
 @AllArgsConstructor
 public class AppUser {
-    @Id @GeneratedValue(strategy = GenerationType.AUTO)
-    private Long id;
-    private String name;
-    private String username;
-    private String password;
+    @Id
+    private Integer id;
+    private String firstName;
+    private String lastName;
+    private String middleName;
+    private String login;
+    private String passHash;
+    private String passSalt;
     private String email;
-    @ManyToMany(fetch = FetchType.EAGER)
-    private Collection<Role> roles = new ArrayList<>();
+    private Integer roleId;
 }
