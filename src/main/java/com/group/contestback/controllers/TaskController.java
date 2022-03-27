@@ -56,6 +56,32 @@ public class TaskController {
         taskService.addCourse(form.getName(), form.getYear());
         return ResponseEntity.ok().build();
     }
+    @ApiOperation(value = "Добавляет задание на курс")
+    @PostMapping("/addTaskToCourse")
+    public ResponseEntity<?> addTaskToCourse(@RequestBody addTaskToCourseForm form) {
+        return ResponseEntity.ok().body(taskService.addTaskToCourse(form.getTaskId(), form.getCourseId()));
+    }
+    @ApiOperation(value = "Возращает все группы")
+    @GetMapping("/allGroups")
+    public ResponseEntity<?> getAllGroups() {
+        return ResponseEntity.ok().body(taskService.getAllGroups());
+    }
+    @ApiOperation(value = "Добавляет новую группу")
+    @PostMapping("/addGroup")
+    public ResponseEntity<?> addGroup(@RequestBody addGroupForm form) {
+        taskService.addGroup(form.getNumber(), form.getYear());
+        return ResponseEntity.ok().build();
+    }
+    @ApiOperation(value = "Возращает таблицу со всеми группами и их курсами")
+    @GetMapping("/allGroupsCourses")
+    public ResponseEntity<?> getAllGroupsCourses() {
+        return ResponseEntity.ok().body(taskService.getAllGroupCourses());
+    }
+    @ApiOperation(value = "Добавляет группу на курс")
+    @PostMapping("/addGroupOnCourse")
+    public ResponseEntity<?> addGroupOnCourse(@RequestBody addGroupOnCourse form) {
+        return ResponseEntity.ok().body(taskService.addGroupOnCourse(form.getCourseId(), form.getGroupId()));
+    }
 }
 @Data
 class addTaskForm {
@@ -69,4 +95,19 @@ class addTaskForm {
 class addCourseForm {
     private String name;
     private Integer year;
+}
+@Data
+class addTaskToCourseForm {
+    private Integer taskId;
+    private Integer courseId;
+}
+@Data
+class addGroupForm {
+    private String number;
+    private Integer year;
+}
+@Data
+class addGroupOnCourse {
+    private Integer courseId;
+    private Integer groupId;
 }
