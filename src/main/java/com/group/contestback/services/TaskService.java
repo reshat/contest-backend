@@ -1,5 +1,6 @@
 package com.group.contestback.services;
 
+import com.group.contestback.models.Courses;
 import com.group.contestback.models.TaskTypes;
 import com.group.contestback.models.Tasks;
 
@@ -11,5 +12,7 @@ public interface TaskService {
     void addTask(String name, String solution, String deadline, String description, Integer taskTypeId);
     List<Tasks> getTasks();
     List<Tasks> getTasksByUser(String login);
+    List<Courses> getAllCourses();
+    void addCourse(String name, Integer year);
 
 }

@@ -1,8 +1,10 @@
 package com.group.contestback.services;
 
 import com.group.contestback.models.AppUser;
+import com.group.contestback.models.Courses;
 import com.group.contestback.models.TaskTypes;
 import com.group.contestback.models.Tasks;
+import com.group.contestback.repositories.CoursesRepo;
 import com.group.contestback.repositories.TaskTypesRepo;
 import com.group.contestback.repositories.TasksRepo;
 import lombok.RequiredArgsConstructor;
@@ -22,6 +24,7 @@ public class TaskServiceClass implements TaskService{
     private final TasksRepo tasksRepo;
     private final TaskTypesRepo taskTypesRepo;
     private final AppUserService appUserService;
+    private final CoursesRepo coursesRepo;
     @Override
     public void addTaskType(String name) {
         TaskTypes taskTypes = new TaskTypes(name);
@@ -52,5 +55,16 @@ public class TaskServiceClass implements TaskService{
     public List<Tasks> getTasksByUser(String login) {
         AppUser user = appUserService.getAppUser(login);
         return tasksRepo.findAll(); // temporary solution
+    }
+
+    @Override
+    public List<Courses> getAllCourses() {
+        return coursesRepo.findAll();
+    }
+
+    @Override
+    public void addCourse(String name, Integer year) {
+        Courses courses = new Courses(name, year);
+        coursesRepo.save(courses);
     }
 }

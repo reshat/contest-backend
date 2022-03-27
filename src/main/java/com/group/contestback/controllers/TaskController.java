@@ -41,9 +41,20 @@ public class TaskController {
         return ResponseEntity.ok().build();
     }
     @ApiOperation(value = "Возращает все задания")
-    @GetMapping("/all")
+    @GetMapping("/allTasks")
     public ResponseEntity<?> getAllTasks() {
         return ResponseEntity.ok().body(taskService.getTasks());
+    }
+    @ApiOperation(value = "Возращает все курсы")
+    @GetMapping("/allCourses")
+    public ResponseEntity<?> getAllCourses() {
+        return ResponseEntity.ok().body(taskService.getAllCourses());
+    }
+    @ApiOperation(value = "Добавляет новый курс")
+    @PostMapping("/addCourse")
+    public ResponseEntity<?> addCourse(@RequestBody addCourseForm form) {
+        taskService.addCourse(form.getName(), form.getYear());
+        return ResponseEntity.ok().build();
     }
 }
 @Data
@@ -53,4 +64,9 @@ class addTaskForm {
     private String deadline;
     private String description;
     private Integer taskTypeId;
+}
+@Data
+class addCourseForm {
+    private String name;
+    private Integer year;
 }
