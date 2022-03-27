@@ -5,6 +5,7 @@ import com.group.contestback.services.AppUserService;
 import com.group.contestback.services.TaskService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -24,8 +25,32 @@ public class TaskController {
 
     @ApiOperation(value = "Добавляет новый тип заданий")
     @PostMapping("/addtasktype")
-    public ResponseEntity<List<AppUser>> addTaskType(@RequestBody String name) {
+    public ResponseEntity<?> addTaskType(@RequestBody String name) {
         taskService.addTaskType(name);
         return ResponseEntity.ok().build();
     }
+    @ApiOperation(value = "Возращает все типы заданий")
+    @GetMapping("/taskTypes")
+    public ResponseEntity<?> getTaskTypes() {
+        return ResponseEntity.ok().body(taskService.getTaskTypes());
+    }
+    @ApiOperation(value = "Добавляет новое задание")
+    @PostMapping("/addtask")
+    public ResponseEntity<?> addTask(@RequestBody addTaskForm form) {
+        taskService.addTask(form.getName(), form.getSolution(), form.getDeadline(), form.getDescription(), form.getTaskTypeId());
+        return ResponseEntity.ok().build();
+    }
+    @ApiOperation(value = "Возращает все задания")
+    @GetMapping("/all")
+    public ResponseEntity<?> getAllTasks() {
+        return ResponseEntity.ok().body(taskService.getTasks());
+    }
+}
+@Data
+class addTaskForm {
+    private String name;
+    private String solution;
+    private String deadline;
+    private String description;
+    private Integer taskTypeId;
 }

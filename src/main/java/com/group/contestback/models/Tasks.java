@@ -4,9 +4,9 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
+import javax.persistence.*;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 @Entity
@@ -15,6 +15,7 @@ import java.util.Date;
 @AllArgsConstructor
 public class Tasks {
     @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private Integer id;
     private String name;
     private String description;
@@ -22,4 +23,16 @@ public class Tasks {
     private Date deadLine;
     @Column(name="tasktypeid")
     private Integer taskTypeId;
+
+    public Tasks(String name, String solution, String deadline, String description, Integer taskTypeId) throws ParseException {
+        this.name = name;
+        this.solution = solution;
+        //"30-03-2022 23:37:50";
+
+        SimpleDateFormat formatter=new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
+
+        this.deadLine = formatter.parse(deadline);
+        this.description = description;
+        this.taskTypeId = taskTypeId;
+    }
 }
