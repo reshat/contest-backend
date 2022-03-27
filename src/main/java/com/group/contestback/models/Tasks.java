@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import java.util.Date;
@@ -19,5 +20,6 @@ public class Tasks {
     private String description;
     private String solution;
     private Date deadLine;
+    @Column(name="tasktypeid")
     private Integer taskTypeId;
 }

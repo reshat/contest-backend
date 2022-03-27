@@ -11,4 +11,5 @@ public interface AppUserService {
     AppUser getAppUser(String login);
     List<AppUser> getUsers();
     void addEmailToUser(String login, String email);
+    void setUserGroup(String login, Integer id);
 }

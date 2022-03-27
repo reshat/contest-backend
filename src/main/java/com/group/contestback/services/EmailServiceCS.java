@@ -45,6 +45,6 @@ public class EmailServiceCS{
             message.setText(text);
             log.info("before email sent");
 
-            getJavaMailSender().send(message);
+           // getJavaMailSender().send(message);
         }
 }

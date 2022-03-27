@@ -7,7 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 import java.util.Optional;
 
-public interface RolesRepo extends JpaRepository<Roles,Long> {
+public interface RolesRepo extends JpaRepository<Roles,Integer> {
     List<Roles> findAllById(Integer Id);
-
+    Roles findByName(String name);
 }

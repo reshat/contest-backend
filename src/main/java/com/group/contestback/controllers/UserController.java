@@ -43,6 +43,12 @@ public class UserController {
         userService.addRoleToUser(form.getLogin(), form.getRoleName(), form.getDescription());
         return ResponseEntity.ok().build();
     }
+    @ApiOperation(value = "Изменяет группу пользователя")
+    @PostMapping("/user/setgroup")
+    public ResponseEntity<?> setUserGroup(@RequestBody GroupToUserForm form) {
+        userService.setUserGroup(form.getLogin(), form.getGroupId());
+        return ResponseEntity.ok().build();
+    }
     @ApiOperation(value = "Отправка тестового собщения на почту разработчика")
     @PostMapping("/user/sendmail")
     public void sendMail() {
@@ -65,4 +71,9 @@ class RoleToUserForm {
 class EmailToUserForm {
     private String login;
     private String email;
+}
+@Data
+class GroupToUserForm {
+    private String login;
+    private Integer groupId;
 }

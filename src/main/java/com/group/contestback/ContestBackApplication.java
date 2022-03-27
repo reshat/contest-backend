@@ -22,11 +22,9 @@ public class ContestBackApplication {
         return args -> {
             if(userService.getUsers().size() == 0) {
                 AppUser user = new AppUser(1, "Ivan","ivan","ivanovich",
-                        "ivanLogin", "", "", "reshat.sultan@yandex.ru",1 );
+                        "ivanLogin", "", "", "reshat.sultan@yandex.ru",1,1);
                 userService.saveAppUser(user);
-                userService.addRoleToUser(user.getLogin(),"ROLE_USER", "NONE");
             }
-
         };
     }
     @Bean
