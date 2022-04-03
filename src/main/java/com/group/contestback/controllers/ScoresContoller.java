@@ -1,5 +1,6 @@
 package com.group.contestback.controllers;
 
+import com.group.contestback.models.Attempts;
 import com.group.contestback.models.Scores;
 import com.group.contestback.services.AppUserService;
 import com.group.contestback.services.ScoresService;
@@ -26,7 +27,7 @@ public class ScoresContoller {
     private final TaskService taskService;
     private final ScoresService scoresService;
 
-    @ApiOperation(value = "Добавляет новый тип заданий")
+    @ApiOperation(value = "Добавляет новую оценку")
     @PostMapping("/addScore")
     public ResponseEntity<?> addScore(@RequestBody ScoreForm scoreForm) {
         try {
@@ -42,6 +43,26 @@ public class ScoresContoller {
     public ResponseEntity<?> getAllScores() {
         return ResponseEntity.ok().body(scoresService.getAllScores());
     }
+
+    @ApiOperation(value = "Добавляет новую попытку")
+    @PostMapping("/addAttempt")
+    public ResponseEntity<?> addAttempt(@RequestBody AttemptForm attemptForm) {
+        try {
+            // Check logic needed
+            // depending on taskTypeId
+            Boolean succeeded = false;
+            Attempts attempt = new Attempts(attemptForm.getUserId(), attemptForm.getTaskId(), attemptForm.getTime(), succeeded, attemptForm.getSolution());
+            scoresService.addAttempt(attempt);
+            return ResponseEntity.ok().build();
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+    @ApiOperation(value = "Возращает все попытки")
+    @GetMapping("/allAttempts")
+    public ResponseEntity<?> getAllAttempts() {
+        return ResponseEntity.ok().body(scoresService.getAllAttempts());
+    }
 }
 @Data
 class ScoreForm {
@@ -50,5 +71,12 @@ class ScoreForm {
     private Integer score;
     private String date;
     private Integer teacherId;
+    private String solution;
+}
+@Data
+class AttemptForm {
+    private Integer userId;
+    private Integer taskId;
+    private String time;
     private String solution;
 }

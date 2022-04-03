@@ -3,10 +3,11 @@ package com.group.contestback.models;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.Type;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
+import javax.persistence.*;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 @Entity
@@ -15,6 +16,7 @@ import java.util.Date;
 @AllArgsConstructor
 public class Attempts {
     @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private Integer id;
     @Column(name="userid")
     private Integer userId;
@@ -23,4 +25,13 @@ public class Attempts {
     private Date time;
     private Boolean succeeded;
     private String solution;
+
+    public Attempts(Integer userId, Integer taskId, String time, Boolean succeeded, String solution) throws ParseException {
+        this.userId = userId;
+        this.taskId = taskId;
+        SimpleDateFormat formatter=new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
+        this.time = formatter.parse(time);
+        this.succeeded = succeeded;
+        this.solution = solution;
+    }
 }
