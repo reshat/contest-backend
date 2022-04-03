@@ -4,9 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
+import javax.persistence.*;
 import java.util.Date;
 
 @Entity
@@ -15,9 +13,16 @@ import java.util.Date;
 @AllArgsConstructor
 public class Mails {
     @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private Integer id;
     @Column(name="touseremail")
     private String toUserEmail;
     private String text;
     private Date date;
+
+    public Mails(String toUserEmail, String text, Date date) {
+        this.toUserEmail = toUserEmail;
+        this.text = text;
+        this.date = date;
+    }
 }

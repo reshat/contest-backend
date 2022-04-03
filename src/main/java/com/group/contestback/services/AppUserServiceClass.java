@@ -2,6 +2,7 @@ package com.group.contestback.services;
 
 import com.group.contestback.models.AppUser;
 import com.group.contestback.models.Groups;
+import com.group.contestback.models.Mails;
 import com.group.contestback.models.Roles;
 import com.group.contestback.repositories.AppUserRepo;
 import com.group.contestback.repositories.GroupsRepo;
@@ -19,10 +20,7 @@ import org.springframework.stereotype.Service;
 
 import javax.management.relation.Role;
 import javax.transaction.Transactional;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Service @RequiredArgsConstructor @Transactional @Slf4j
 public class AppUserServiceClass implements AppUserService, UserDetailsService {
@@ -37,7 +35,8 @@ public class AppUserServiceClass implements AppUserService, UserDetailsService {
     public AppUser saveAppUser(AppUser user) {
         user.setPassHash(passwordEncoder.encode(user.getPassHash()));
         log.info("Registering new user" + user.getLogin() + " " + user.getEmail());
-        emailServiceCS.sendSimpleMessage(user.getEmail(),"Регистрация","Вы были успешно зарегистрированы");
+        Mails mails = new Mails(user.getEmail(),"Вы были успешно зарегистрированы",new Date());
+        emailServiceCS.sendSimpleMessage(mails);
         return userRepo.save(user);
     }
 
@@ -67,9 +66,11 @@ public class AppUserServiceClass implements AppUserService, UserDetailsService {
     @Override
     public void addEmailToUser(String login, String email) {
         AppUser user = userRepo.findByLogin(login);
-        emailServiceCS.sendSimpleMessage(user.getEmail(),"Изменение почты","Ваша почта была изменена на " + email);
+        Mails mail1 = new Mails(user.getEmail(), "Изменение почты\",\"Ваша почта была изменена на " + email, new Date());
+        emailServiceCS.sendSimpleMessage(mail1);
         user.setEmail(email);
-        emailServiceCS.sendSimpleMessage(user.getEmail(),"Изменение почты","Ваша почта была изменена на " + email);
+        Mails mail2 = new Mails(user.getEmail(), "Изменение почты\",\"Ваша почта была изменена на " + email, new Date());
+        emailServiceCS.sendSimpleMessage(mail2);
     }
 
     @Override

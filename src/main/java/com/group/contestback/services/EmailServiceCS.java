@@ -1,5 +1,9 @@
 package com.group.contestback.services;
 
+import com.group.contestback.models.Mails;
+import com.group.contestback.repositories.MailsRepo;
+import com.group.contestback.repositories.NotificationTypesRepo;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -8,12 +12,20 @@ import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.util.Properties;
-@Slf4j
 
-@Component
+@Service
+@RequiredArgsConstructor
+@Transactional
+@Slf4j
 public class EmailServiceCS{
+
+    private final MailsRepo mailsRepo;
+    private final NotificationTypesRepo notificationTypesRepo;
+
 
     @Value("${spring.mail.password}")
     private String userPassword;
@@ -34,16 +46,18 @@ public class EmailServiceCS{
 
         return mailSender;
     }
-        public void sendSimpleMessage(
-                String to, String subject, String text) {
+        public void sendSimpleMessage(Mails mails) {
 
             SimpleMailMessage message = new SimpleMailMessage();
 
             message.setFrom("contest-server@mail.ru");
-            message.setTo(to);
-            message.setSubject(subject);
-            message.setText(text);
+            message.setTo(mails.getToUserEmail());
+            message.setSubject("Информация");
+            message.setText(mails.getText());
             log.info("before email sent");
+            mailsRepo.save(mails);
+
+
 
            // getJavaMailSender().send(message);
         }

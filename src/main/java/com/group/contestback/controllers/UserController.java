@@ -24,8 +24,6 @@ import java.util.List;
 @Slf4j
 public class UserController {
     private final AppUserService userService;
-    @Autowired
-    private EmailServiceCS emailServiceCS;
 
     @ApiOperation(value = "Возращает всех пользователей")
     @GetMapping("/users")
@@ -48,11 +46,6 @@ public class UserController {
     public ResponseEntity<?> setUserGroup(@RequestBody GroupToUserForm form) {
         userService.setUserGroup(form.getLogin(), form.getGroupId());
         return ResponseEntity.ok().build();
-    }
-    @ApiOperation(value = "Отправка тестового собщения на почту разработчика")
-    @PostMapping("/user/sendmail")
-    public void sendMail() {
-        emailServiceCS.sendSimpleMessage("reshat.sultan@yandex.ru","subj","test");
     }
     @ApiOperation(value = "Добавляет почту к пользователю")
     @PostMapping("/user/addEmail")
