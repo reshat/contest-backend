@@ -4,9 +4,9 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
+import javax.persistence.*;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 @Entity
@@ -15,6 +15,7 @@ import java.util.Date;
 @AllArgsConstructor
 public class Scores {
     @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private Integer id;
     @Column(name="userid")
     private Integer userId;
@@ -24,4 +25,15 @@ public class Scores {
     private Date date;
     @Column(name="teacherid")
     private Integer teacherId;
+    private String solution;
+
+    public Scores(Integer userId, Integer taskId, Integer score, String date, Integer teacherId, String solution) throws ParseException {
+        this.userId = userId;
+        this.taskId = taskId;
+        this.score = score;
+        SimpleDateFormat formatter=new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
+        this.date = formatter.parse(date);
+        this.teacherId = teacherId;
+        this.solution = solution;
+    }
 }

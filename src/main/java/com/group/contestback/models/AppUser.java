@@ -15,6 +15,7 @@ import java.util.Collection;
 @Table(name = "users")
 public class AppUser {
     @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private Integer id;
     @Column(name="firstname")
     private String firstName;
@@ -32,4 +33,16 @@ public class AppUser {
     private Integer roleId;
     @Column(name="groupid")
     private Integer groupId;
+
+    public AppUser(String firstName, String lastName, String middleName, String login, String passHash, String passSalt, String email, Integer roleId, Integer groupId) {
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.middleName = middleName;
+        this.login = login;
+        this.passHash = passHash;
+        this.passSalt = passSalt;
+        this.email = email;
+        this.roleId = roleId;
+        this.groupId = groupId;
+    }
 }
