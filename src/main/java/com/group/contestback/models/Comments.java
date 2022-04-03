@@ -4,9 +4,9 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
+import javax.persistence.*;
+import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
 import java.util.Date;
 
 @Entity
@@ -15,6 +15,7 @@ import java.util.Date;
 @AllArgsConstructor
 public class Comments {
     @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private Integer id;
     @Column(name="totaskid")
     private Integer toTaskId;
@@ -22,4 +23,14 @@ public class Comments {
     private Integer fromUserId;
     private Date date;
     private Boolean deleted;
+    private String solution;
+
+    public Comments(Integer toTaskId, Integer fromUserId, String solution) {
+        this.toTaskId = toTaskId;
+        this.fromUserId = fromUserId;
+        this.solution = solution;
+        this.deleted = false;
+        this.date = new Date();
+        //this.date = java.sql.Date.valueOf(String.valueOf(LocalDateTime.now()));
+    }
 }
