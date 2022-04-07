@@ -14,4 +14,5 @@ public interface ScoresService {
     List<Attempts> getAllAttempts();
     ResultsResponse checkSolution(Integer userId, Integer taskId, String solution) throws ParseException;
     List<Scores> getStudentScores();
+    List<Scores> getGroupScoresForTask(Integer groupId, Integer taskId);
 }

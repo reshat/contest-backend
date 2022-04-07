@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
@@ -78,6 +79,25 @@ public class ScoresServiceClass implements ScoresService{
     @Override
     public List<Scores> getStudentScores() {
         return scoresRepo.findAllByUserId(appUserRepo.findByLogin( SecurityContextHolder.getContext().getAuthentication().getPrincipal().toString()).getId());
+    }
+
+    @Override
+    public List<Scores> getGroupScoresForTask(Integer groupId, Integer taskId) {
+        List<Scores> scores = scoresRepo.findAllScoresByTaskAndGroup(groupId, taskId);
+        List<AppUser> users = appUserRepo.findAllByGroupId(groupId);
+        List<Scores> result = new ArrayList<>();
+        users.forEach(appUser -> {
+            Integer resSize = result.size();
+            scores.forEach(scores1 -> {
+                if(appUser.getId() == scores1.getUserId()){
+                    result.add(scores1);
+                }
+            });
+            if(resSize == result.size()){
+                result.add(new Scores(null,appUser.getId(),taskId,null,null,null,null));
+            }
+        });
+        return result;
     }
 }
 

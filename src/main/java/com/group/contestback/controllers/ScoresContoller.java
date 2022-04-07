@@ -55,6 +55,12 @@ public class ScoresContoller {
         return ResponseEntity.ok().body(scoresService.getStudentScores());
     }
 
+    @ApiOperation(value = "Возращает оценки группы по заданию")
+    @GetMapping("/groupScoresForTask")
+    public ResponseEntity<?> getGroupScoresForTask(@RequestBody GroupTask groupTask) {
+        return ResponseEntity.ok().body(scoresService.getGroupScoresForTask(groupTask.getGroupId(), groupTask.getTaskId()));
+    }
+
     @ApiOperation(value = "Добавляет новую попытку")
     @PostMapping("/addAttempt")
     public ResponseEntity<?> addAttempt(@RequestBody AttemptForm attemptForm) {
@@ -85,4 +91,9 @@ class AttemptForm {
     private Integer userId;
     private Integer taskId;
     private String solution;
+}
+@Data
+class GroupTask {
+    private Integer groupId;
+    private Integer taskId;
 }
