@@ -26,11 +26,10 @@ public class Attempts {
     private Boolean succeeded;
     private String solution;
 
-    public Attempts(Integer userId, Integer taskId, String time, Boolean succeeded, String solution) throws ParseException {
+    public Attempts(Integer userId, Integer taskId, Boolean succeeded, String solution) {
         this.userId = userId;
         this.taskId = taskId;
-        SimpleDateFormat formatter=new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
-        this.time = formatter.parse(time);
+        this.time = new Date();
         this.succeeded = succeeded;
         this.solution = solution;
     }

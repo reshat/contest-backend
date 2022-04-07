@@ -2,6 +2,7 @@ package com.group.contestback.controllers;
 
 import com.group.contestback.models.Attempts;
 import com.group.contestback.models.Scores;
+import com.group.contestback.security.CustomAccessDeniedHandler;
 import com.group.contestback.services.AppUserService;
 import com.group.contestback.services.ScoresService;
 import com.group.contestback.services.TaskService;
@@ -10,11 +11,15 @@ import io.swagger.annotations.ApiOperation;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.Bean;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.web.bind.annotation.*;
 
 import javax.persistence.Column;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 @Api(tags = {"Scores controller"})
 @RestController
@@ -31,7 +36,7 @@ public class ScoresContoller {
     @PostMapping("/addScore")
     public ResponseEntity<?> addScore(@RequestBody ScoreForm scoreForm) {
         try {
-            Scores score = new Scores(scoreForm.getUserId(),scoreForm.getTaskId(),scoreForm.getScore(),scoreForm.getDate(),scoreForm.getTeacherId(),scoreForm.getSolution());
+            Scores score = new Scores(scoreForm.getUserId(),scoreForm.getTaskId(),scoreForm.getScore(),scoreForm.getTeacherId(),scoreForm.getSolution());
             scoresService.addScore(score);
             return ResponseEntity.ok().build();
         } catch (Exception e) {
@@ -50,10 +55,7 @@ public class ScoresContoller {
         try {
             // Check logic needed
             // depending on taskTypeId
-            Boolean succeeded = false;
-            Attempts attempt = new Attempts(attemptForm.getUserId(), attemptForm.getTaskId(), attemptForm.getTime(), succeeded, attemptForm.getSolution());
-            scoresService.addAttempt(attempt);
-            return ResponseEntity.ok().build();
+            return ResponseEntity.ok().body(scoresService.checkSolution(attemptForm.getUserId(),attemptForm.getTaskId(),attemptForm.getSolution()));
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
@@ -69,7 +71,6 @@ class ScoreForm {
     private Integer userId;
     private Integer taskId;
     private Integer score;
-    private String date;
     private Integer teacherId;
     private String solution;
 }
@@ -77,6 +78,5 @@ class ScoreForm {
 class AttemptForm {
     private Integer userId;
     private Integer taskId;
-    private String time;
     private String solution;
 }

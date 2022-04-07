@@ -27,12 +27,11 @@ public class Scores {
     private Integer teacherId;
     private String solution;
 
-    public Scores(Integer userId, Integer taskId, Integer score, String date, Integer teacherId, String solution) throws ParseException {
+    public Scores(Integer userId, Integer taskId, Integer score, Integer teacherId, String solution) {
         this.userId = userId;
         this.taskId = taskId;
         this.score = score;
-        SimpleDateFormat formatter=new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
-        this.date = formatter.parse(date);
+        this.date = new Date();
         this.teacherId = teacherId;
         this.solution = solution;
     }
