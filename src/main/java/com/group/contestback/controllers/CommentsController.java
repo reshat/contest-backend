@@ -40,6 +40,11 @@ public class CommentsController {
     public ResponseEntity<?> getAllComments() {
         return ResponseEntity.ok().body(commentsService.getAllComments());
     }
+    @ApiOperation(value = "Возращает все коментарии к заданию")
+    @GetMapping("/getCommentsToTask")
+    public ResponseEntity<?> getAllCommentsToTask(@RequestBody Integer toTaskId) {
+        return ResponseEntity.ok().body(commentsService.getCommentsToTask(toTaskId));
+    }
 }
 @Data
 class CommentsForm {

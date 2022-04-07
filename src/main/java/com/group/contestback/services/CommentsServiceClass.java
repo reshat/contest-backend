@@ -24,4 +24,9 @@ public class CommentsServiceClass implements CommentsService {
     public List<Comments> getAllComments() {
         return commentsRepo.findAll();
     }
+
+    @Override
+    public List<Comments> getCommentsToTask(Integer toTaskId) {
+        return commentsRepo.getAllByToTaskIdAndDeleted(toTaskId, false);
+    }
 }
