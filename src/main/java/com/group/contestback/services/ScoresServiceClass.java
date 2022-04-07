@@ -6,6 +6,7 @@ import com.group.contestback.models.Attempts;
 import com.group.contestback.models.Scores;
 import com.group.contestback.repositories.AppUserRepo;
 import com.group.contestback.repositories.AttemptsRepo;
+import com.group.contestback.repositories.RolesRepo;
 import com.group.contestback.repositories.ScoresRepo;
 import com.group.contestback.responseTypes.ResultsResponse;
 import com.group.contestback.responseTypes.Result;
@@ -31,6 +32,7 @@ public class ScoresServiceClass implements ScoresService{
     private final ScoresRepo scoresRepo;
     private final AttemptsRepo attemptsRepo;
     private final AppUserRepo appUserRepo;
+    private final RolesRepo rolesRepo;
     @Override
     public void addScore(Scores score) {
         scoresRepo.save(score);
@@ -78,7 +80,7 @@ public class ScoresServiceClass implements ScoresService{
 
     @Override
     public List<Scores> getStudentScores() {
-        return scoresRepo.findAllByUserId(appUserRepo.findByLogin( SecurityContextHolder.getContext().getAuthentication().getPrincipal().toString()).getId());
+        return scoresRepo.findAllByUserId(appUserRepo.findByLogin(SecurityContextHolder.getContext().getAuthentication().getPrincipal().toString()).getId());
     }
 
     @Override
@@ -87,17 +89,24 @@ public class ScoresServiceClass implements ScoresService{
         List<AppUser> users = appUserRepo.findAllByGroupId(groupId);
         List<Scores> result = new ArrayList<>();
         users.forEach(appUser -> {
-            Integer resSize = result.size();
+            int resSize = result.size();
             scores.forEach(scores1 -> {
-                if(appUser.getId() == scores1.getUserId()){
+                if(appUser.getId().equals(scores1.getUserId())){
                     result.add(scores1);
                 }
             });
-            if(resSize == result.size()){
+            if(resSize == result.size() && rolesRepo.getById(appUser.getRoleId()).getName().equals("ROLE_USER")){
                 result.add(new Scores(null,appUser.getId(),taskId,null,null,null,null));
             }
         });
         return result;
+    }
+
+    @Override
+    public List<Attempts> getStudentAttemptsOnTask(Integer taskId) {
+        log.info(appUserRepo.findByLogin(SecurityContextHolder.getContext().getAuthentication().getPrincipal().toString()).getId().toString());
+        log.info(taskId.toString());
+        return attemptsRepo.findAllByTaskIdAndUserId(taskId,appUserRepo.findByLogin(SecurityContextHolder.getContext().getAuthentication().getPrincipal().toString()).getId());
     }
 }
 

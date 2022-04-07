@@ -55,6 +55,12 @@ public class ScoresContoller {
         return ResponseEntity.ok().body(scoresService.getStudentScores());
     }
 
+    @ApiOperation(value = "Возращает попытки студента к заданию")
+    @GetMapping("/studentAttempts")
+    public ResponseEntity<?> getStudentAttempts(@RequestBody String taskId) {
+        return ResponseEntity.ok().body(scoresService.getStudentAttemptsOnTask(Integer.parseInt(taskId)));
+    }
+
     @ApiOperation(value = "Возращает оценки группы по заданию")
     @GetMapping("/groupScoresForTask")
     public ResponseEntity<?> getGroupScoresForTask(@RequestBody GroupTask groupTask) {
