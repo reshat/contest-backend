@@ -45,11 +45,24 @@ public class TaskController {
     public ResponseEntity<?> getAllTasks() {
         return ResponseEntity.ok().body(taskService.getTasks());
     }
+
+    @ApiOperation(value = "Возращает все задания курса")
+    @GetMapping("/allTasksByCourse")
+    public ResponseEntity<?> getAllTasksByCourse(@RequestBody String courseId) {
+        return ResponseEntity.ok().body(taskService.getTasksByCourse(Integer.parseInt(courseId)));
+    }
     @ApiOperation(value = "Возращает все курсы")
     @GetMapping("/allCourses")
     public ResponseEntity<?> getAllCourses() {
         return ResponseEntity.ok().body(taskService.getAllCourses());
     }
+
+    @ApiOperation(value = "Возращает все курсы студента")
+    @GetMapping("/studentCourses")
+    public ResponseEntity<?> getAllStudentCourses() {
+        return ResponseEntity.ok().body(taskService.getStudentCourses());
+    }
+
     @ApiOperation(value = "Добавляет новый курс")
     @PostMapping("/addCourse")
     public ResponseEntity<?> addCourse(@RequestBody addCourseForm form) {

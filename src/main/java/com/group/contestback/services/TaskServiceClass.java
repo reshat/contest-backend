@@ -3,8 +3,10 @@ package com.group.contestback.services;
 import com.group.contestback.models.*;
 import com.group.contestback.repositories.*;
 import com.group.contestback.responseTypes.GroupCoursesWithNames;
+import com.group.contestback.responseTypes.StudentTaskResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -24,6 +26,7 @@ public class TaskServiceClass implements TaskService{
     private final TaskCoursesRepo taskCoursesRepo;
     private final GroupsRepo groupsRepo;
     private final GroupCoursesRepo groupCoursesRepo;
+    private final AppUserRepo appUserRepo;
     @Override
     public void addTaskType(String name) {
         TaskTypes taskTypes = new TaskTypes(name);
@@ -51,10 +54,15 @@ public class TaskServiceClass implements TaskService{
     }
 
     @Override
-    public List<Tasks> getTasksByUser(String login) {
-        AppUser user = appUserService.getAppUser(login);
-        return tasksRepo.findAll(); // temporary solution
+    public List<Tasks> getTasksByCourse(Integer courseId) {
+        List<TaskCourses> taskCourses = taskCoursesRepo.findAllByCourseId(courseId);
+        List<Tasks> tasks = new ArrayList<>();
+        for(int i = 0; i < taskCourses.size(); ++i) {
+            tasks.add(tasksRepo.findById(taskCourses.get(i).getTaskId()).get());
+        }
+        return tasks;
     }
+
 
     @Override
     public List<Courses> getAllCourses() {
@@ -122,6 +130,23 @@ public class TaskServiceClass implements TaskService{
             groupCoursesRepo.save(groupCourses);
         }
         return "";
+    }
+
+    @Override
+    public StudentTaskResponse getStudentCourses() {
+        AppUser appUser = appUserRepo.findByLogin(SecurityContextHolder.getContext().getAuthentication().getPrincipal().toString());
+        List<GroupCourses> groupCourses
+                = groupCoursesRepo.findAllByGroupId(appUser.getGroupId());
+        List<Courses> courses = new ArrayList<>();
+
+        for(int i = 0; i < groupCourses.size(); ++i) {
+            Courses courses1 = coursesRepo.findById(groupCourses.get(i).getCourseId()).get();
+            courses.add(courses1);
+        }
+        StudentTaskResponse studentTaskResponse = new StudentTaskResponse();
+        studentTaskResponse.setUserId(appUser.getId());
+        studentTaskResponse.setCourses(courses);
+        return studentTaskResponse;
     }
 }
 //    private Integer id;
