@@ -4,10 +4,7 @@ package com.group.contestback.services;
 import com.group.contestback.models.AppUser;
 import com.group.contestback.models.Attempts;
 import com.group.contestback.models.Scores;
-import com.group.contestback.repositories.AppUserRepo;
-import com.group.contestback.repositories.AttemptsRepo;
-import com.group.contestback.repositories.RolesRepo;
-import com.group.contestback.repositories.ScoresRepo;
+import com.group.contestback.repositories.*;
 import com.group.contestback.responseTypes.ResultsResponse;
 import com.group.contestback.responseTypes.Result;
 
@@ -33,6 +30,7 @@ public class ScoresServiceClass implements ScoresService{
     private final AttemptsRepo attemptsRepo;
     private final AppUserRepo appUserRepo;
     private final RolesRepo rolesRepo;
+    private final TasksRepo tasksRepo;
     @Override
     public void addScore(Scores score) {
         scoresRepo.save(score);
@@ -56,6 +54,10 @@ public class ScoresServiceClass implements ScoresService{
     @Override
     public ResultsResponse checkSolution(Integer userId, Integer taskId, String solution) {
         ResultsResponse resultsResponse = new ResultsResponse();
+        if(tasksRepo.findById(taskId).get().getDeadLine().getTime() - new Date().getTime() < 0) {
+            resultsResponse.setDeadlinePassed(true);
+            return resultsResponse;
+        }
         List<Attempts> attempts = attemptsRepo.findAllByTaskIdAndUserId(taskId,userId);
         Comparator<Attempts> comparator = (p1, p2) -> (int) (p2.getTime().getTime() - p1.getTime().getTime());
         attempts.sort(comparator);
