@@ -1,8 +1,10 @@
 package com.group.contestback.services;
 
 
+import com.group.contestback.models.AppUser;
 import com.group.contestback.models.Attempts;
 import com.group.contestback.models.Scores;
+import com.group.contestback.repositories.AppUserRepo;
 import com.group.contestback.repositories.AttemptsRepo;
 import com.group.contestback.repositories.ScoresRepo;
 import com.group.contestback.responseTypes.ResultsResponse;
@@ -10,6 +12,8 @@ import com.group.contestback.responseTypes.Result;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -25,6 +29,7 @@ import java.util.List;
 public class ScoresServiceClass implements ScoresService{
     private final ScoresRepo scoresRepo;
     private final AttemptsRepo attemptsRepo;
+    private final AppUserRepo appUserRepo;
     @Override
     public void addScore(Scores score) {
         scoresRepo.save(score);
@@ -68,6 +73,11 @@ public class ScoresServiceClass implements ScoresService{
         attemptsRepo.save(attempt);
 
         return resultsResponse;
+    }
+
+    @Override
+    public List<Scores> getStudentScores() {
+        return scoresRepo.findAllByUserId(appUserRepo.findByLogin( SecurityContextHolder.getContext().getAuthentication().getPrincipal().toString()).getId());
     }
 }
 

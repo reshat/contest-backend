@@ -49,6 +49,12 @@ public class ScoresContoller {
         return ResponseEntity.ok().body(scoresService.getAllScores());
     }
 
+    @ApiOperation(value = "Возращает оценки студента")
+    @GetMapping("/studentScores")
+    public ResponseEntity<?> getStudentScores() {
+        return ResponseEntity.ok().body(scoresService.getStudentScores());
+    }
+
     @ApiOperation(value = "Добавляет новую попытку")
     @PostMapping("/addAttempt")
     public ResponseEntity<?> addAttempt(@RequestBody AttemptForm attemptForm) {
