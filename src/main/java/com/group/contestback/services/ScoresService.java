@@ -3,6 +3,7 @@ package com.group.contestback.services;
 import com.group.contestback.models.Attempts;
 import com.group.contestback.models.Scores;
 import com.group.contestback.responseTypes.GroupCoursesScoresResponse;
+import com.group.contestback.responseTypes.GroupStudents;
 import com.group.contestback.responseTypes.ResultsResponse;
 
 import java.text.ParseException;
@@ -18,4 +19,5 @@ public interface ScoresService {
     List<Scores> getGroupScoresForTask(Integer groupId, Integer taskId);
     List<Attempts> getStudentAttemptsOnTask(Integer taskId);
     GroupCoursesScoresResponse getGroupScoresForCourse(Integer groupId, Integer taskId);
+    List<GroupStudents> getAllManualAttempts();
 }

@@ -62,6 +62,13 @@ public class ScoresContoller {
         return ResponseEntity.ok().body(scoresService.getStudentAttemptsOnTask(Integer.parseInt(taskId)));
     }
 
+    @ApiOperation(value = "Возращает по группам непроверяемые попытки")
+    @GetMapping("/allManualAttempts")
+    public ResponseEntity<?> getAllManualAttempts() {
+        return ResponseEntity.ok().body(scoresService.getAllManualAttempts());
+    }
+
+
     @ApiOperation(value = "Возращает оценки группы по заданию")
     @GetMapping("/groupScoresForTask")
     public ResponseEntity<?> getGroupScoresForTask(@RequestBody GroupTask groupTask) {

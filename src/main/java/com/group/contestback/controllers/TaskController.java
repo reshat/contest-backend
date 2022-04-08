@@ -51,6 +51,7 @@ public class TaskController {
     public ResponseEntity<?> getAllTasksByCourse(@RequestBody String courseId) {
         return ResponseEntity.ok().body(taskService.getTasksByCourse(Integer.parseInt(courseId)));
     }
+
     @ApiOperation(value = "Возращает все курсы")
     @GetMapping("/allCourses")
     public ResponseEntity<?> getAllCourses() {

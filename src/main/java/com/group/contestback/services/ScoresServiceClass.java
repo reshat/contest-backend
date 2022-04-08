@@ -4,6 +4,7 @@ package com.group.contestback.services;
 import com.group.contestback.models.*;
 import com.group.contestback.repositories.*;
 import com.group.contestback.responseTypes.GroupCoursesScoresResponse;
+import com.group.contestback.responseTypes.GroupStudents;
 import com.group.contestback.responseTypes.ResultsResponse;
 import com.group.contestback.responseTypes.Result;
 
@@ -30,6 +31,7 @@ public class ScoresServiceClass implements ScoresService{
     private final TasksRepo tasksRepo;
     private final TaskTypesRepo taskTypesRepo;
     private final TaskCoursesRepo taskCoursesRepo;
+    private final GroupsRepo groupsRepo;
     @Override
     public void addScore(Scores score) {
         scoresRepo.save(score);
@@ -180,6 +182,35 @@ public class ScoresServiceClass implements ScoresService{
             }
 
         return groupCoursesScoresResponse;
+    }
+
+    @Override
+    public List<GroupStudents> getAllManualAttempts() {
+        List<GroupStudents> groupStudents = new ArrayList<>();
+        List<Groups> groups = groupsRepo.findAll();
+        List<Tasks> manualTasks = tasksRepo.findAllByTaskTypeId(3);
+        List<Integer> manualTasksIds = new ArrayList<>();
+        for (Tasks task: manualTasks) {
+            manualTasksIds.add(task.getId());
+        }
+
+        for (Groups group: groups) {
+            GroupStudents groupStud = new GroupStudents();
+            groupStud.setGroups(group);
+            List<AppUser> users = appUserRepo.findAllByGroupId(group.getId());
+            for(AppUser user: users) {
+                List<Attempts> attempts = attemptsRepo.findByTaskUserMaxTime(user.getId());
+                List<Attempts> manualLastAttempts = new ArrayList<>();
+                for(Attempts attempt: attempts) {
+                    if(manualTasksIds.contains(attempt.getTaskId())) {
+                        manualLastAttempts.add(attempt);
+                    }
+                }
+                groupStud.addUser(user, manualLastAttempts);
+            }
+            groupStudents.add(groupStud);
+        }
+        return groupStudents;
     }
 }
 
