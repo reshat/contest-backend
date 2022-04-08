@@ -29,4 +29,11 @@ public class CommentsServiceClass implements CommentsService {
     public List<Comments> getCommentsToTask(Integer toTaskId) {
         return commentsRepo.getAllByToTaskIdAndDeleted(toTaskId, false);
     }
+
+    @Override
+    public void removeComment(Integer commentId) {
+        Comments comments = commentsRepo.getById(commentId);
+        comments.setDeleted(true);
+        commentsRepo.save(comments);
+    }
 }

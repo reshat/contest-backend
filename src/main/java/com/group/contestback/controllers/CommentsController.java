@@ -45,6 +45,12 @@ public class CommentsController {
     public ResponseEntity<?> getAllCommentsToTask(@RequestBody Integer toTaskId) {
         return ResponseEntity.ok().body(commentsService.getCommentsToTask(toTaskId));
     }
+    @ApiOperation(value = "Удаление комментария")
+    @PostMapping("/removeComment")
+    public ResponseEntity<?> removeComment(@RequestBody String commentId) {
+        commentsService.removeComment(Integer.parseInt(commentId));
+        return ResponseEntity.ok().build();
+    }
 }
 @Data
 class CommentsForm {
