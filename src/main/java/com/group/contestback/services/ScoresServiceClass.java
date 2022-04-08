@@ -51,8 +51,9 @@ public class ScoresServiceClass implements ScoresService{
     }
 
     @Override
-    public ResultsResponse checkSolution(Integer userId, Integer taskId, String solution) {
+    public ResultsResponse checkSolution(Integer taskId, String solution) {
         ResultsResponse resultsResponse = new ResultsResponse();
+        Integer userId = appUserRepo.findByLogin(SecurityContextHolder.getContext().getAuthentication().getPrincipal().toString()).getId();
         Tasks task = tasksRepo.findById(taskId).get();
         List<Attempts> attempts = attemptsRepo.findAllByTaskIdAndUserId(taskId,userId);
         String taskType = taskTypesRepo.getById(task.getTaskTypeId()).getName();
@@ -65,7 +66,7 @@ public class ScoresServiceClass implements ScoresService{
         attempts.sort(comparator);
 
 
-        if((new Date().getTime() - attempts.get(0).getTime().getTime() < attempts.size() *60*1000)) {
+        if(attempts.size() > 0 && (new Date().getTime() - attempts.get(0).getTime().getTime() < attempts.size() *60*1000)) {
             resultsResponse.setTimeout((int) (attempts.size()*60*1000 - (new Date().getTime() - attempts.get(0).getTime().getTime())));
             return resultsResponse;
         }
@@ -80,9 +81,9 @@ public class ScoresServiceClass implements ScoresService{
         if(taskType.equals("SIMPLE_TASK")) {
             if(task.getSolution().equals(solution)) {
                 succeeded = true;
-                score = new Scores(userId, taskId, 5, null, "");
+                score = new Scores(userId, taskId, 5, 1, "");
             } else {
-                score = new Scores(userId, taskId, 1, null, "");
+                score = new Scores(userId, taskId, 1, 1, "");
             }
             resultsResponse.setDeadlinePassed(true);
             scoresRepo.save(score);
@@ -113,7 +114,21 @@ public class ScoresServiceClass implements ScoresService{
 
     @Override
     public List<Scores> getStudentScores() {
-        return scoresRepo.findAllByUserId(appUserRepo.findByLogin(SecurityContextHolder.getContext().getAuthentication().getPrincipal().toString()).getId());
+        List<Scores> allScores = scoresRepo.findAllByUserId(appUserRepo.findByLogin(SecurityContextHolder.getContext().getAuthentication().getPrincipal().toString()).getId());
+        List<Scores> lastScores = new ArrayList<>();
+        for (Scores scores : allScores) {
+            Integer taskId = scores.getTaskId();
+            Date date = scores.getDate();
+            for (int k = 0; k < lastScores.size(); ++k) {
+                Scores lastScore = lastScores.get(k);
+                if (lastScore.getTaskId().equals(taskId) && ((lastScore.getDate().getTime() - date.getTime()) < 0)) {
+                    lastScores.remove(lastScore);
+                }
+            }
+            lastScores.add(scores);
+
+        }
+        return lastScores;
     }
 
     @Override

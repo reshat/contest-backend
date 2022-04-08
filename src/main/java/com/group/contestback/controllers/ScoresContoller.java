@@ -80,7 +80,7 @@ public class ScoresContoller {
         try {
             // Check logic needed
             // depending on taskTypeId
-            return ResponseEntity.ok().body(scoresService.checkSolution(attemptForm.getUserId(),attemptForm.getTaskId(),attemptForm.getSolution()));
+            return ResponseEntity.ok().body(scoresService.checkSolution(attemptForm.getTaskId(),attemptForm.getSolution()));
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
@@ -101,7 +101,6 @@ class ScoreForm {
 }
 @Data
 class AttemptForm {
-    private Integer userId;
     private Integer taskId;
     private String solution;
 }

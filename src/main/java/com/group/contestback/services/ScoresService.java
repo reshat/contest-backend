@@ -13,7 +13,7 @@ public interface ScoresService {
     List<Scores> getAllScores();
     void addAttempt(Attempts attempt);
     List<Attempts> getAllAttempts();
-    ResultsResponse checkSolution(Integer userId, Integer taskId, String solution) throws ParseException;
+    ResultsResponse checkSolution(Integer taskId, String solution) throws ParseException;
     List<Scores> getStudentScores();
     List<Scores> getGroupScoresForTask(Integer groupId, Integer taskId);
     List<Attempts> getStudentAttemptsOnTask(Integer taskId);
