@@ -10,10 +10,11 @@ import java.util.List;
 public interface AttemptsRepo extends JpaRepository<Attempts, Integer> {
     List<Attempts> findAllByTaskIdAndUserId(Integer taskId, Integer userId);
     @Query(
-            value = "select a.id, a.userid, a.taskid, a.time, a.succeeded, a.solution" +
-                    " from (select Max(time) as maxTime, taskid " +
-                    "from attempts where userid = ?1 group by taskid)" +
-                    " r inner join attempts a on r.taskid = a.taskid and a.time = r.maxTime",
+            value = "SELECT t1.id, t1.userid, t1.taskid, t1.time, t1.succeeded, t1.solution " +
+                    "FROM (   select a.id, a.userid, a.taskid, a.time, a.succeeded, a.solution " +
+                    "from(select Max(time) as maxTime, taskid from attempts where userid = ?1 group by taskid)" +
+                    " r inner join attempts a on r.taskid = a.taskid and a.time = r.maxTime) t1 " +
+                    "WHERE NOT EXISTS (SELECT t2.taskid FROM scores t2 WHERE t1.taskid = t2.taskid)",
             nativeQuery = true)
     List<Attempts> findByTaskUserMaxTime(Integer userId);
 }
