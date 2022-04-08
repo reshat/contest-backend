@@ -4,6 +4,7 @@ package com.group.contestback.services;
 import com.group.contestback.models.AppUser;
 import com.group.contestback.models.Attempts;
 import com.group.contestback.models.Scores;
+import com.group.contestback.models.Tasks;
 import com.group.contestback.repositories.*;
 import com.group.contestback.responseTypes.ResultsResponse;
 import com.group.contestback.responseTypes.Result;
@@ -31,6 +32,7 @@ public class ScoresServiceClass implements ScoresService{
     private final AppUserRepo appUserRepo;
     private final RolesRepo rolesRepo;
     private final TasksRepo tasksRepo;
+    private final TaskTypesRepo taskTypesRepo;
     @Override
     public void addScore(Scores score) {
         scoresRepo.save(score);
@@ -54,27 +56,59 @@ public class ScoresServiceClass implements ScoresService{
     @Override
     public ResultsResponse checkSolution(Integer userId, Integer taskId, String solution) {
         ResultsResponse resultsResponse = new ResultsResponse();
-        if(tasksRepo.findById(taskId).get().getDeadLine().getTime() - new Date().getTime() < 0) {
+        Tasks task = tasksRepo.findById(taskId).get();
+        List<Attempts> attempts = attemptsRepo.findAllByTaskIdAndUserId(taskId,userId);
+        String taskType = taskTypesRepo.getById(task.getTaskTypeId()).getName();
+
+        if((attempts.size() > 0 && taskType.equals("SIMPLE_TASK")) || (task.getDeadLine().getTime() - new Date().getTime() < 0)) {
             resultsResponse.setDeadlinePassed(true);
             return resultsResponse;
         }
-        List<Attempts> attempts = attemptsRepo.findAllByTaskIdAndUserId(taskId,userId);
         Comparator<Attempts> comparator = (p1, p2) -> (int) (p2.getTime().getTime() - p1.getTime().getTime());
         attempts.sort(comparator);
 
-        if(attempts.size() > 0 && (new Date().getTime() - attempts.get(0).getTime().getTime() < 60*1000)) {
+
+        if((new Date().getTime() - attempts.get(0).getTime().getTime() < attempts.size()*60*1000)) {
             resultsResponse.setTimeout((int) (attempts.size()*60*1000 - (new Date().getTime() - attempts.get(0).getTime().getTime())));
             return resultsResponse;
         }
 
         //needed logic go check solution
-        for(int i = 0; i < 2; ++i) {
-            Result result = new Result("Test" + i,false);
-            resultsResponse.getResults().add(result);
-        }
         Boolean succeeded = false;
+        Scores score;
+
+        // SIMPLE_TASK - only 1 attempt
+        // SQL_TASK - attempts restricted by time, but results are shown immediately
+        // MANUAL_TASK - attempts restricted by time
+        if(taskType.equals("SIMPLE_TASK")) {
+            if(task.getSolution().equals(solution)) {
+                succeeded = true;
+                score = new Scores(userId, taskId, 5, null, "");
+            } else {
+                score = new Scores(userId, taskId, 1, null, "");
+            }
+            resultsResponse.setDeadlinePassed(true);
+            scoresRepo.save(score);
+        } else if(taskType.equals("SQL_TASK")) {
+            Boolean noErrors = true;
+            for(int i = 0; i < 2; ++i) {
+                noErrors = false;
+                Result result = new Result("Test" + i,false);
+                resultsResponse.getResults().add(result);
+            }
+            if(noErrors) {
+                succeeded = true;
+                score = new Scores(userId, taskId, 5, 1, solution);
+            } else {
+                score = new Scores(userId, taskId, 1, 1, solution);
+            }
+            resultsResponse.setTimeout((attempts.size() + 1)*60*1000);
+            scoresRepo.save(score);
+        } else {
+            resultsResponse.setTimeout((attempts.size() + 1)*60*1000);
+        }
+
         Attempts attempt = new Attempts(userId, taskId, succeeded, solution);
-        resultsResponse.setTimeout((attempts.size() + 1)*60*1000);
         attemptsRepo.save(attempt);
 
         return resultsResponse;

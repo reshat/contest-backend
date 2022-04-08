@@ -8,6 +8,7 @@ import java.util.List;
 
 public interface ScoresRepo extends JpaRepository<Scores, Integer>{
     List<Scores> findAllByUserId(Integer userId);
+    List<Scores> findAllByUserIdAndTaskId(Integer userId, Integer taskId);
     @Query(
             value = "select Scores.id, userId, taskId, " +
                     "teacherId, date, score, solution from Scores " +
