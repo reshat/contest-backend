@@ -42,8 +42,8 @@ public class CommentsController {
     }
     @ApiOperation(value = "Возращает все коментарии к заданию")
     @GetMapping("/getCommentsToTask")
-    public ResponseEntity<?> getAllCommentsToTask(@RequestBody Integer toTaskId) {
-        return ResponseEntity.ok().body(commentsService.getCommentsToTask(toTaskId));
+    public ResponseEntity<?> getAllCommentsToTask(@RequestBody String toTaskId) {
+        return ResponseEntity.ok().body(commentsService.getCommentsToTask(Integer.parseInt(toTaskId)));
     }
     @ApiOperation(value = "Удаление комментария")
     @PostMapping("/removeComment")

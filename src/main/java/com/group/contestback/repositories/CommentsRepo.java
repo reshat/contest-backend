@@ -6,5 +6,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 
 public interface CommentsRepo extends JpaRepository<Comments, Integer> {
-    List<Comments> getAllByToTaskIdAndDeleted(Integer toTaskId, Boolean deleted);
+    List<Comments> getCommentsByToTaskIdAndDeletedIsFalse(Integer toTaskId);
 }
