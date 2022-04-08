@@ -1,22 +1,18 @@
 package com.group.contestback.services;
 
 
-import com.group.contestback.models.AppUser;
-import com.group.contestback.models.Attempts;
-import com.group.contestback.models.Scores;
-import com.group.contestback.models.Tasks;
+import com.group.contestback.models.*;
 import com.group.contestback.repositories.*;
+import com.group.contestback.responseTypes.GroupCoursesScoresResponse;
 import com.group.contestback.responseTypes.ResultsResponse;
 import com.group.contestback.responseTypes.Result;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
-import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Date;
@@ -33,6 +29,7 @@ public class ScoresServiceClass implements ScoresService{
     private final RolesRepo rolesRepo;
     private final TasksRepo tasksRepo;
     private final TaskTypesRepo taskTypesRepo;
+    private final TaskCoursesRepo taskCoursesRepo;
     @Override
     public void addScore(Scores score) {
         scoresRepo.save(score);
@@ -68,13 +65,13 @@ public class ScoresServiceClass implements ScoresService{
         attempts.sort(comparator);
 
 
-        if((new Date().getTime() - attempts.get(0).getTime().getTime() < attempts.size()*60*1000)) {
+        if((new Date().getTime() - attempts.get(0).getTime().getTime() < attempts.size() *60*1000)) {
             resultsResponse.setTimeout((int) (attempts.size()*60*1000 - (new Date().getTime() - attempts.get(0).getTime().getTime())));
             return resultsResponse;
         }
 
         //needed logic go check solution
-        Boolean succeeded = false;
+        boolean succeeded = false;
         Scores score;
 
         // SIMPLE_TASK - only 1 attempt
@@ -90,7 +87,7 @@ public class ScoresServiceClass implements ScoresService{
             resultsResponse.setDeadlinePassed(true);
             scoresRepo.save(score);
         } else if(taskType.equals("SQL_TASK")) {
-            Boolean noErrors = true;
+            boolean noErrors = true;
             for(int i = 0; i < 2; ++i) {
                 noErrors = false;
                 Result result = new Result("Test" + i,false);
@@ -143,6 +140,31 @@ public class ScoresServiceClass implements ScoresService{
         log.info(appUserRepo.findByLogin(SecurityContextHolder.getContext().getAuthentication().getPrincipal().toString()).getId().toString());
         log.info(taskId.toString());
         return attemptsRepo.findAllByTaskIdAndUserId(taskId,appUserRepo.findByLogin(SecurityContextHolder.getContext().getAuthentication().getPrincipal().toString()).getId());
+    }
+
+    @Override
+    public GroupCoursesScoresResponse getGroupScoresForCourse(Integer groupId, Integer courseId) {
+        List<TaskCourses> taskCourses = taskCoursesRepo.findAllByCourseId(courseId);
+        List<AppUser> users = appUserRepo.findAllByGroupId(groupId);
+        GroupCoursesScoresResponse groupCoursesScoresResponse = new GroupCoursesScoresResponse();
+
+            for(AppUser user: users) {
+                List<Scores> userScores = new ArrayList<>();
+                for(TaskCourses taskCourse: taskCourses) {
+                    List<Scores> scores = scoresRepo.findAllByUserIdAndTaskId(user.getId(), taskCourse.getTaskId());
+                    if(scores.size() > 0){
+                        Comparator<Scores> comparator = (p1, p2) -> (int) (p2.getDate().getTime() - p1.getDate().getTime());
+                        scores.sort(comparator);
+                        userScores.add(scores.get(0));
+                    } else {
+                        Scores nullScore = new Scores(user.getId(),taskCourse.getTaskId(),null,null,null);
+                        userScores.add(nullScore);
+                    }
+                }
+                groupCoursesScoresResponse.addUser(userScores, user.getId(), user.getLogin(), user.getFirstName(), user.getLastName(),user.getMiddleName(), user.getEmail(), user.getRoleId(),user.getGroupId());
+            }
+
+        return groupCoursesScoresResponse;
     }
 }
 

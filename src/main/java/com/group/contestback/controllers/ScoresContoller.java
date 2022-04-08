@@ -8,6 +8,7 @@ import com.group.contestback.services.ScoresService;
 import com.group.contestback.services.TaskService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.models.auth.In;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -67,6 +68,12 @@ public class ScoresContoller {
         return ResponseEntity.ok().body(scoresService.getGroupScoresForTask(groupTask.getGroupId(), groupTask.getTaskId()));
     }
 
+    @ApiOperation(value = "Возращает оценки группы по курсу")
+    @GetMapping("/groupScoresForCourse")
+    public ResponseEntity<?> getGroupScoresForTask(@RequestBody GroupCourse groupCourse) {
+        return ResponseEntity.ok().body(scoresService.getGroupScoresForCourse(groupCourse.getGroupId(), groupCourse.getCourseId()));
+    }
+
     @ApiOperation(value = "Добавляет новую попытку")
     @PostMapping("/addAttempt")
     public ResponseEntity<?> addAttempt(@RequestBody AttemptForm attemptForm) {
@@ -102,4 +109,9 @@ class AttemptForm {
 class GroupTask {
     private Integer groupId;
     private Integer taskId;
+}
+@Data
+class GroupCourse {
+    private Integer courseId;
+    private Integer groupId;
 }
