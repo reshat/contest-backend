@@ -12,6 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -22,6 +23,9 @@ import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.util.*;
+import java.util.function.Predicate;
+
+import static org.hibernate.criterion.Restrictions.like;
 
 @Service @RequiredArgsConstructor @Transactional @Slf4j
 public class AppUserServiceClass implements AppUserService, UserDetailsService {
@@ -67,6 +71,11 @@ public class AppUserServiceClass implements AppUserService, UserDetailsService {
     @Override
     public Page<AppUser> getUsersPage(int page, int pageSize) {
         return userRepo.findAll(PageRequest.of(page, pageSize));
+    }
+
+    @Override
+    public Page<AppUser> findUsersByLastNamePage(int page, int pageSize, String str) {
+        return userRepo.nameSearch('%' + str + '%', PageRequest.of(page,pageSize));
     }
 
     @Override
