@@ -10,6 +10,8 @@ import com.group.contestback.repositories.RolesRepo;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -18,7 +20,6 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import javax.management.relation.Role;
 import javax.transaction.Transactional;
 import java.util.*;
 
@@ -61,6 +62,11 @@ public class AppUserServiceClass implements AppUserService, UserDetailsService {
     @Override
     public List<AppUser> getUsers() {
         return userRepo.findAll();
+    }
+
+    @Override
+    public Page<AppUser> getUsersPage(int page, int pageSize) {
+        return userRepo.findAll(PageRequest.of(page, pageSize));
     }
 
     @Override

@@ -11,6 +11,7 @@ import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -29,6 +30,11 @@ public class UserController {
     @GetMapping("/users")
     public ResponseEntity<List<AppUser>> getUsers() {
         return ResponseEntity.ok().body(userService.getUsers());
+    }
+    @ApiOperation(value = "Возращает определенную страницу, определенного размера пользователей")
+    @GetMapping("/usersPage")
+    public ResponseEntity<Page<AppUser>> getUsersPage(@RequestBody PageSize pageSize) {
+        return ResponseEntity.ok().body(userService.getUsersPage(pageSize.getPage(), pageSize.getPageSize()));
     }
     @ApiOperation(value = "Добавляет нового пользователя", notes = "Роли указывать необязательно, для этого существует другой запрос")
     @PostMapping("/user/add")
@@ -69,4 +75,9 @@ class EmailToUserForm {
 class GroupToUserForm {
     private String login;
     private Integer groupId;
+}
+@Data
+class PageSize {
+    private Integer page;
+    private Integer pageSize;
 }
