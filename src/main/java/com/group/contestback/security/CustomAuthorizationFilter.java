@@ -4,13 +4,18 @@ import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.interfaces.DecodedJWT;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.env.Environment;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
 
+import javax.annotation.Resource;
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -24,6 +29,8 @@ import java.util.Set;
 import static java.util.Arrays.stream;
 @Slf4j
 public class CustomAuthorizationFilter extends OncePerRequestFilter {
+    private String secret;
+
     private final String[] tokenExceptions = {
             "api-docs",
             "configuration",
@@ -32,8 +39,15 @@ public class CustomAuthorizationFilter extends OncePerRequestFilter {
             "swagger-ui.html",
             "webjars"
     };
+
+    public CustomAuthorizationFilter(String secret) {
+        this.secret = secret;
+    }
+
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+
+        log.info(secret);
         if(request.getServletPath().equals("/login")
                 || Arrays.stream(tokenExceptions).anyMatch(request.getServletPath()::contains)) {
             log.info("inside exception");
@@ -45,7 +59,7 @@ public class CustomAuthorizationFilter extends OncePerRequestFilter {
             log.info("authentication header is present " + String.valueOf(authorizationHeader != null));
             if(authorizationHeader != null) {
                 try {
-                    Algorithm algorithm = Algorithm.HMAC256("secret".getBytes());
+                    Algorithm algorithm = Algorithm.HMAC256(secret.getBytes());
                     JWTVerifier verifier = JWT.require(algorithm).build();
                     DecodedJWT decodedJWT = verifier.verify(authorizationHeader);
                     String username = decodedJWT.getSubject();
