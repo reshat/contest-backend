@@ -98,7 +98,7 @@ public class ScoresContoller {
         try {
             // Check logic needed
             // depending on taskTypeId
-            return ResponseEntity.ok().body(scoresService.checkSimpleSolution(attemptForm.getTaskId(),attemptForm.getSolution()));
+            return ResponseEntity.ok().body(scoresService.checkSimpleSolution(attemptForm.getTaskId(),attemptForm.getSolutionsId()));
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
@@ -126,7 +126,7 @@ class AttemptSQLForm {
 @Data
 class AttemptSimpleForm {
     private Integer taskId;
-    private List<String> solution;
+    private List<Integer> solutionsId;
 }
 @Data
 class GroupTask {

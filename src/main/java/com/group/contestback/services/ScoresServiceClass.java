@@ -110,7 +110,7 @@ public class ScoresServiceClass implements ScoresService{
     }
 
     @Override
-    public Integer checkSimpleSolution(Integer taskId, List<String> solutions) {
+    public Integer checkSimpleSolution(Integer taskId, List<Integer> solutionsId) {
         Integer userId = appUserRepo.findByLogin(SecurityContextHolder.getContext().getAuthentication().getPrincipal().toString()).getId();
         Tasks task = tasksRepo.findById(taskId).get();
         List<Attempts> attempts = attemptsRepo.findAllByTaskIdAndUserId(taskId,userId);
@@ -128,11 +128,11 @@ public class ScoresServiceClass implements ScoresService{
 
         // SIMPLE_TASK - only 1 attempt
         List<SolutionVariants> solutionVariants = solutionVariantsRepo.findAllByTaskId(taskId);
-        List<String> rightSolutions = new ArrayList<>();
+        List<Integer> rightSolutions = new ArrayList<>();
 
         for (SolutionVariants solutionVariant: solutionVariants) {
             if(solutionVariant.getIsAnswer()) {
-                rightSolutions.add(solutionVariant.getSolution());
+                rightSolutions.add(solutionVariant.getId());
             }
         }
         if(rightSolutions.size() == 0) {
@@ -141,17 +141,20 @@ public class ScoresServiceClass implements ScoresService{
         Integer numberOfWrongSolutions = 0;
         Integer numberOfRightSolutions = 0;
 
-        for(String solution: solutions) {
-            if(!rightSolutions.contains(solution)) {
+        for(Integer solutionId: solutionsId) {
+            if(!rightSolutions.contains(solutionId)) {
                 numberOfWrongSolutions++;
             } else {
                 numberOfRightSolutions++;
             }
         }
         Integer result = numberOfRightSolutions/rightSolutions.size()*4 - numberOfWrongSolutions*2 + 1;
-        Attempts attempt = new Attempts(userId, taskId, result == 5? true : false, solutions.toString());
+        if(result < 1) {
+            result = 1;
+        }
+        Attempts attempt = new Attempts(userId, taskId, result == 5? true : false, solutionsId.toString());
         attemptsRepo.save(attempt);
-        Scores score = new Scores(userId, taskId, result, 1, solutions.toString());
+        Scores score = new Scores(userId, taskId, result, 1, solutionsId.toString());
         scoresRepo.save(score);
         return result;
     }
