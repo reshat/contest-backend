@@ -4,6 +4,7 @@ import com.group.contestback.models.*;
 import com.group.contestback.repositories.*;
 import com.group.contestback.responseTypes.GroupCoursesWithNames;
 import com.group.contestback.responseTypes.StudentTaskResponse;
+import com.group.contestback.responseTypes.TaskResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -27,6 +28,8 @@ public class TaskServiceClass implements TaskService{
     private final GroupsRepo groupsRepo;
     private final GroupCoursesRepo groupCoursesRepo;
     private final AppUserRepo appUserRepo;
+    private final SolutionVariantsRepo solutionVariantsRepo;
+
     @Override
     public void addTaskType(String name) {
         TaskTypes taskTypes = new TaskTypes(name);
@@ -48,19 +51,36 @@ public class TaskServiceClass implements TaskService{
         }
     }
 
-    @Override
-    public List<Tasks> getTasks() {
-        return tasksRepo.findAll();
+    private void fillTasks(List<TaskResponse> taskResponses, Tasks task, TaskResponse taskResponse) {
+        taskResponse.setTask(task);
+        List<SolutionVariants> solutionVariants = solutionVariantsRepo.findAllByTaskId(task.getId());
+        for(int k = 0; k < solutionVariants.size(); ++k) {
+            taskResponse.addSolutionVariant(solutionVariants.get(k).getId(), solutionVariants.get(k).getSolution(), solutionVariants.get(k).getTaskId());
+        }
+        taskResponses.add(taskResponse);
     }
 
     @Override
-    public List<Tasks> getTasksByCourse(Integer courseId) {
-        List<TaskCourses> taskCourses = taskCoursesRepo.findAllByCourseId(courseId);
-        List<Tasks> tasks = new ArrayList<>();
-        for(int i = 0; i < taskCourses.size(); ++i) {
-            tasks.add(tasksRepo.findById(taskCourses.get(i).getTaskId()).get());
+    public List<TaskResponse> getTasks() {
+        List<TaskResponse> taskResponses = new ArrayList<>();
+        List<Tasks> tasks = tasksRepo.findAll();
+        for(Tasks task: tasks) {
+            TaskResponse taskResponse = new TaskResponse();
+            fillTasks(taskResponses, task, taskResponse);
         }
-        return tasks;
+        return taskResponses;
+    }
+
+    @Override
+    public List<TaskResponse> getTasksByCourse(Integer courseId) {
+        List<TaskResponse> taskResponses = new ArrayList<>();
+        List<TaskCourses> taskCourses = taskCoursesRepo.findAllByCourseId(courseId);
+        for(int i = 0; i < taskCourses.size(); ++i) {
+            TaskResponse taskResponse = new TaskResponse();
+            Tasks task = tasksRepo.findById(taskCourses.get(i).getTaskId()).get();
+            fillTasks(taskResponses, task, taskResponse);
+        }
+        return taskResponses;
     }
 
 

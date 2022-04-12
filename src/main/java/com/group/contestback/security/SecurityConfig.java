@@ -58,7 +58,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         http.authorizeRequests().antMatchers(HttpMethod.GET,"/api/users/**").hasAnyAuthority("ROLE_ADMIN");
         http.authorizeRequests().antMatchers(HttpMethod.GET,"/score/studentScores/**").hasAnyAuthority("ROLE_USER", "ROLE_ADMIN");
         http.authorizeRequests().antMatchers(HttpMethod.GET,"/score/studentAttempts/**").hasAnyAuthority("ROLE_USER", "ROLE_ADMIN");
-        http.authorizeRequests().antMatchers(HttpMethod.POST,"/score/addAttempt/**").hasAnyAuthority("ROLE_USER", "ROLE_ADMIN");
+        http.authorizeRequests().antMatchers(HttpMethod.POST,"/score/addSQLAttempt/**").hasAnyAuthority("ROLE_USER", "ROLE_ADMIN");
+        http.authorizeRequests().antMatchers(HttpMethod.POST,"/score/addSimpleAttempt/**").hasAnyAuthority("ROLE_USER", "ROLE_ADMIN");
+
         http.authorizeRequests().antMatchers(HttpMethod.GET,"/task/studentCourses/**").hasAnyAuthority("ROLE_USER", "ROLE_ADMIN");
         http.authorizeRequests().antMatchers(HttpMethod.GET,"/task/allTasksByCourse/**").hasAnyAuthority("ROLE_USER", "ROLE_ADMIN");
         http.authorizeRequests().antMatchers(HttpMethod.GET,"/comment/getCommentsToTask/**").hasAnyAuthority("ROLE_USER", "ROLE_ADMIN");

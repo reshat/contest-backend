@@ -32,6 +32,8 @@ public class ScoresServiceClass implements ScoresService{
     private final TaskTypesRepo taskTypesRepo;
     private final TaskCoursesRepo taskCoursesRepo;
     private final GroupsRepo groupsRepo;
+    private final SolutionVariantsRepo solutionVariantsRepo;
+
     @Override
     public void addScore(Scores score) {
         scoresRepo.save(score);
@@ -53,16 +55,19 @@ public class ScoresServiceClass implements ScoresService{
     }
 
     @Override
-    public ResultsResponse checkSolution(Integer taskId, String solution) {
+    public ResultsResponse checkSQLSolution(Integer taskId, String solution) {
         ResultsResponse resultsResponse = new ResultsResponse();
         Integer userId = appUserRepo.findByLogin(SecurityContextHolder.getContext().getAuthentication().getPrincipal().toString()).getId();
         Tasks task = tasksRepo.findById(taskId).get();
         List<Attempts> attempts = attemptsRepo.findAllByTaskIdAndUserId(taskId,userId);
         String taskType = taskTypesRepo.getById(task.getTaskTypeId()).getName();
 
-        if((attempts.size() > 0 && taskType.equals("SIMPLE_TASK")) || (task.getDeadLine().getTime() - new Date().getTime() < 0)) {
-            resultsResponse.setDeadlinePassed(true);
-            return resultsResponse;
+        if(!(taskType.equals("SQL_TASK") || taskType.equals("MANUAL_TASK"))) {
+            throw new RuntimeException("Wrong request for task type");
+        }
+
+        if((task.getDeadLine().getTime() - new Date().getTime() < 0)) {
+            throw new RuntimeException("The deadline expired");
         }
         Comparator<Attempts> comparator = (p1, p2) -> (int) (p2.getTime().getTime() - p1.getTime().getTime());
         attempts.sort(comparator);
@@ -77,19 +82,9 @@ public class ScoresServiceClass implements ScoresService{
         boolean succeeded = false;
         Scores score;
 
-        // SIMPLE_TASK - only 1 attempt
         // SQL_TASK - attempts restricted by time, but results are shown immediately
         // MANUAL_TASK - attempts restricted by time
-        if(taskType.equals("SIMPLE_TASK")) {
-            if(task.getSolution().equals(solution)) {
-                succeeded = true;
-                score = new Scores(userId, taskId, 5, 1, "");
-            } else {
-                score = new Scores(userId, taskId, 1, 1, "");
-            }
-            resultsResponse.setDeadlinePassed(true);
-            scoresRepo.save(score);
-        } else if(taskType.equals("SQL_TASK")) {
+        if(taskType.equals("SQL_TASK")) {
             boolean noErrors = true;
             for(int i = 0; i < 2; ++i) {
                 noErrors = false;
@@ -112,6 +107,53 @@ public class ScoresServiceClass implements ScoresService{
         attemptsRepo.save(attempt);
 
         return resultsResponse;
+    }
+
+    @Override
+    public Integer checkSimpleSolution(Integer taskId, List<String> solutions) {
+        Integer userId = appUserRepo.findByLogin(SecurityContextHolder.getContext().getAuthentication().getPrincipal().toString()).getId();
+        Tasks task = tasksRepo.findById(taskId).get();
+        List<Attempts> attempts = attemptsRepo.findAllByTaskIdAndUserId(taskId,userId);
+        String taskType = taskTypesRepo.getById(task.getTaskTypeId()).getName();
+        if(!taskType.equals("SIMPLE_TASK")) {
+            throw new RuntimeException("Wrong request for task type");
+        }
+        if(attempts.size() > 0) {
+            throw new RuntimeException("Only 1 attempt allowed");
+        }
+        if(task.getDeadLine().getTime() - new Date().getTime() < 0) {
+            throw new RuntimeException("The deadline expired");
+        }
+
+
+        // SIMPLE_TASK - only 1 attempt
+        List<SolutionVariants> solutionVariants = solutionVariantsRepo.findAllByTaskId(taskId);
+        List<String> rightSolutions = new ArrayList<>();
+
+        for (SolutionVariants solutionVariant: solutionVariants) {
+            if(solutionVariant.getIsAnswer()) {
+                rightSolutions.add(solutionVariant.getSolution());
+            }
+        }
+        if(rightSolutions.size() == 0) {
+            throw new RuntimeException("Task doesn't have right solutions, contact administrator");
+        }
+        Integer numberOfWrongSolutions = 0;
+        Integer numberOfRightSolutions = 0;
+
+        for(String solution: solutions) {
+            if(!rightSolutions.contains(solution)) {
+                numberOfWrongSolutions++;
+            } else {
+                numberOfRightSolutions++;
+            }
+        }
+        Integer result = numberOfRightSolutions/rightSolutions.size()*4 - numberOfWrongSolutions*2 + 1;
+        Attempts attempt = new Attempts(userId, taskId, result == 5? true : false, solutions.toString());
+        attemptsRepo.save(attempt);
+        Scores score = new Scores(userId, taskId, result, 1, solutions.toString());
+        scoresRepo.save(score);
+        return result;
     }
 
     @Override

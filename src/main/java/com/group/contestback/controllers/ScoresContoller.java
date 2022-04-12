@@ -82,16 +82,28 @@ public class ScoresContoller {
     }
 
     @ApiOperation(value = "Добавляет новую попытку")
-    @PostMapping("/addAttempt")
-    public ResponseEntity<?> addAttempt(@RequestBody AttemptForm attemptForm) {
+    @PostMapping("/addSQLAttempt")
+    public ResponseEntity<?> addSQLAttempt(@RequestBody AttemptSQLForm attemptForm) {
         try {
             // Check logic needed
             // depending on taskTypeId
-            return ResponseEntity.ok().body(scoresService.checkSolution(attemptForm.getTaskId(),attemptForm.getSolution()));
+            return ResponseEntity.ok().body(scoresService.checkSQLSolution(attemptForm.getTaskId(),attemptForm.getSolution()));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().header("error", e.getMessage()).body(e.getMessage());
+        }
+    }
+    @ApiOperation(value = "Добавляет новую попытку")
+    @PostMapping("/addSimpleAttempt")
+    public ResponseEntity<?> addSimpleAttempt(@RequestBody AttemptSimpleForm attemptForm) {
+        try {
+            // Check logic needed
+            // depending on taskTypeId
+            return ResponseEntity.ok().body(scoresService.checkSimpleSolution(attemptForm.getTaskId(),attemptForm.getSolution()));
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
+
     @ApiOperation(value = "Возращает все попытки")
     @GetMapping("/allAttempts")
     public ResponseEntity<?> getAllAttempts() {
@@ -107,9 +119,14 @@ class ScoreForm {
     private String solution;
 }
 @Data
-class AttemptForm {
+class AttemptSQLForm {
     private Integer taskId;
     private String solution;
+}
+@Data
+class AttemptSimpleForm {
+    private Integer taskId;
+    private List<String> solution;
 }
 @Data
 class GroupTask {
