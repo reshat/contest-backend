@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Data
-public class ResultsResponse {
+public class ResultScoreResponse {
     private Integer timeout;
-    List<List<String>> openResult;
+    private List<Result> results = new ArrayList<>();
 }

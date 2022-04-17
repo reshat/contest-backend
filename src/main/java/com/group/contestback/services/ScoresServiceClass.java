@@ -3,21 +3,18 @@ package com.group.contestback.services;
 
 import com.group.contestback.models.*;
 import com.group.contestback.repositories.*;
-import com.group.contestback.responseTypes.GroupCoursesScoresResponse;
-import com.group.contestback.responseTypes.GroupStudents;
-import com.group.contestback.responseTypes.ResultsResponse;
-import com.group.contestback.responseTypes.Result;
+import com.group.contestback.responseTypes.*;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
-import java.util.ArrayList;
-import java.util.Comparator;
+import java.sql.*;
+import java.util.*;
 import java.util.Date;
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -33,6 +30,21 @@ public class ScoresServiceClass implements ScoresService{
     private final TaskCoursesRepo taskCoursesRepo;
     private final GroupsRepo groupsRepo;
     private final SolutionVariantsRepo solutionVariantsRepo;
+
+    @Value("${spring.datasource.url}")
+    private String dataSourceURL;
+
+    @Value("${user.sql.username}")
+    private String username;
+
+    @Value("${user.sql.password}")
+    private String userPass;
+
+    @Value("${open.table.schema}")
+    private String openSchema;
+
+    @Value("${closed.table.schema}")
+    private String closedSchema;
 
     @Override
     public void addScore(Scores score) {
@@ -52,6 +64,47 @@ public class ScoresServiceClass implements ScoresService{
     @Override
     public List<Attempts> getAllAttempts() {
         return attemptsRepo.findAll();
+    }
+
+    private List<List<String>> runSQLQueryUser(String solution, String schema) throws ClassNotFoundException, SQLException {
+        Class.forName("org.postgresql.Driver");
+
+        Properties props = new Properties();
+        props.setProperty("user",username);
+        props.setProperty("password",userPass);
+        Connection connection = DriverManager.getConnection(dataSourceURL, props);
+
+        log.info("schema " + connection.getSchema());
+
+        Statement statement = connection.createStatement();
+
+
+        log.info("SET search_path TO hiddentests; " + solution);
+        log.info(String.valueOf(statement.executeUpdate("SET search_path TO " + schema)));
+        ResultSet resultSet = statement.executeQuery(solution);
+
+        ResultSetMetaData resultSetMetaData = resultSet.getMetaData();
+        final int columnCount = resultSetMetaData.getColumnCount();
+
+        List<List<String>> result = new ArrayList<>();
+
+        List<String> columnNameRow = new ArrayList<>();
+
+        for (int i = 1; i <= columnCount; ++i) {
+            columnNameRow.add(resultSetMetaData.getColumnName(i));
+        }
+        result.add(columnNameRow);
+
+        while (resultSet.next()) {
+            List<String> resRow = new ArrayList<>();
+            for (int i = 1; i <= columnCount; i++) {
+                resRow.add(resultSet.getObject(i).toString());
+            }
+            result.add(resRow);
+        }
+        statement.close();
+        connection.close();
+        return result;
     }
 
     @Override
@@ -78,34 +131,129 @@ public class ScoresServiceClass implements ScoresService{
             return resultsResponse;
         }
 
+        // SQL_TASK - attempts restricted by time, but results are shown immediately
+        // MANUAL_TASK - attempts restricted by time
+        if(taskType.equals("SQL_TASK")) {
+
+            try {
+                List<List<String>> studentResults = runSQLQueryUser(solution, "opentests");
+                resultsResponse.setOpenResult(studentResults);
+
+            } catch (Exception e) {
+                log.error(e.getMessage());
+            }
+
+            resultsResponse.setTimeout((attempts.size() + 1)*60*1000);
+        } else {
+            resultsResponse.setTimeout((attempts.size() + 1)*60*1000);
+        }
+
+        Attempts attempt = new Attempts(userId, taskId, false, solution);
+        attemptsRepo.save(attempt);
+
+        return resultsResponse;
+    }
+
+    @Override
+    public ResultScoreResponse checkSQLSolutionScore(Integer taskId, String solution) {
+        ResultScoreResponse resultsResponse = new ResultScoreResponse();
+        Integer userId = appUserRepo.findByLogin(SecurityContextHolder.getContext().getAuthentication().getPrincipal().toString()).getId();
+        Tasks task = tasksRepo.findById(taskId).get();
+        List<Scores> scores = scoresRepo.findAllByUserIdAndTaskId(taskId,userId);
+        String taskType = taskTypesRepo.getById(task.getTaskTypeId()).getName();
+
+        if(!(taskType.equals("SQL_TASK") || taskType.equals("MANUAL_TASK"))) {
+            throw new RuntimeException("Wrong request for task type");
+        }
+
+        if((task.getDeadLine().getTime() - new Date().getTime() < 0)) {
+            throw new RuntimeException("The deadline expired");
+        }
+        Comparator<Scores> comparator = (p1, p2) -> (int) (p2.getDate().getTime() - p1.getDate().getTime());
+        scores.sort(comparator);
+
+
+        if(scores.size() > 0 && (new Date().getTime() - scores.get(0).getDate().getTime() < scores.size() *60*1000)) {
+            resultsResponse.setTimeout((int) (scores.size()*60*1000 - (new Date().getTime() - scores.get(0).getDate().getTime())));
+            return resultsResponse;
+        }
+
         //needed logic go check solution
         boolean succeeded = false;
-        Scores score;
 
         // SQL_TASK - attempts restricted by time, but results are shown immediately
         // MANUAL_TASK - attempts restricted by time
         if(taskType.equals("SQL_TASK")) {
             boolean noErrors = true;
-            for(int i = 0; i < 2; ++i) {
-                noErrors = false;
-                Result result = new Result("Test" + i,false);
+            boolean noOpenTestsError = true;
+            boolean noHiddenTestError = true;
+
+            try {
+
+                List<List<String>> studentResults = runSQLQueryUser(solution, "opentests");
+                List<List<String>> teacherResults = runSQLQueryUser(tasksRepo.findById(taskId).get().getSolution(), "opentests");
+
+                if(studentResults.size() != teacherResults.size()) {
+                    noOpenTestsError = false;
+                }
+
+                if(!studentResults.equals(teacherResults)) {
+                    noOpenTestsError = false;
+                }
+                Result result = new Result("Open test",noOpenTestsError);
+                resultsResponse.getResults().add(result);
+
+            } catch (Exception e) {
+                log.error(e.getMessage());
+                noOpenTestsError = false;
+                Result result = new Result("Open test",false);
                 resultsResponse.getResults().add(result);
             }
-            if(noErrors) {
-                succeeded = true;
-                score = new Scores(userId, taskId, 5, 1, solution);
-            } else {
-                score = new Scores(userId, taskId, 1, 1, solution);
+
+            try {
+
+                List<List<String>> studentResults = runSQLQueryUser(solution, "hiddenTests");
+                List<List<String>> teacherResults = runSQLQueryUser(tasksRepo.findById(taskId).get().getSolution(), "hiddenTests");
+
+                if(studentResults.size() != teacherResults.size()) {
+                    noHiddenTestError = false;
+                }
+
+                if(!studentResults.equals(teacherResults)) {
+                    noHiddenTestError = false;
+                }
+
+                /*for(int i = 0; i < studentResults.size(); ++i) {
+                    if(studentResults.get(i).size() != teacherResults.get(i).size()) {
+                        noHiddenTestError = false;
+                    }
+                    for (int k = 0; k < studentResults.get(i).size(); ++k){
+                        if(!studentResults.get(i).get(k).equals(teacherResults.get(i).get(k))) {
+                            noHiddenTestError = false;
+                        }
+                    }
+                }*/
+                Result result = new Result("Hidden test",noHiddenTestError);
+                resultsResponse.getResults().add(result);
+
+            } catch (Exception e) {
+                log.error(e.getMessage());
+                noHiddenTestError = false;
+                Result result = new Result("Hidden test",false);
+                resultsResponse.getResults().add(result);
             }
-            resultsResponse.setTimeout((attempts.size() + 1)*60*1000);
-            scoresRepo.save(score);
+
+            resultsResponse.setTimeout((scores.size() + 1)*60*1000);
+
+            Integer score = 1;
+            if(noHiddenTestError && noOpenTestsError) {
+                score = 5;
+            }
+            scoresRepo.save(new Scores(userId, taskId, score, 1,solution));
+
         } else {
-            resultsResponse.setTimeout((attempts.size() + 1)*60*1000);
+            resultsResponse.setTimeout((scores.size() + 1)*60*1000);
         }
-
-        Attempts attempt = new Attempts(userId, taskId, succeeded, solution);
-        attemptsRepo.save(attempt);
-
         return resultsResponse;
     }
 

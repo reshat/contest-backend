@@ -81,12 +81,19 @@ public class ScoresContoller {
         return ResponseEntity.ok().body(scoresService.getGroupScoresForCourse(groupCourse.getGroupId(), groupCourse.getCourseId()));
     }
 
+    @ApiOperation(value = "Добавляет новую попытку на оценку")
+    @PostMapping("/addSQLAttemptScore")
+    public ResponseEntity<?> addSQLAttemptScore(@RequestBody AttemptSQLForm attemptForm) {
+        try {
+            return ResponseEntity.ok().body(scoresService.checkSQLSolutionScore(attemptForm.getTaskId(),attemptForm.getSolution()));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().header("error", e.getMessage()).body(e.getMessage());
+        }
+    }
     @ApiOperation(value = "Добавляет новую попытку")
     @PostMapping("/addSQLAttempt")
     public ResponseEntity<?> addSQLAttempt(@RequestBody AttemptSQLForm attemptForm) {
         try {
-            // Check logic needed
-            // depending on taskTypeId
             return ResponseEntity.ok().body(scoresService.checkSQLSolution(attemptForm.getTaskId(),attemptForm.getSolution()));
         } catch (Exception e) {
             return ResponseEntity.badRequest().header("error", e.getMessage()).body(e.getMessage());
@@ -96,8 +103,6 @@ public class ScoresContoller {
     @PostMapping("/addSimpleAttempt")
     public ResponseEntity<?> addSimpleAttempt(@RequestBody AttemptSimpleForm attemptForm) {
         try {
-            // Check logic needed
-            // depending on taskTypeId
             return ResponseEntity.ok().body(scoresService.checkSimpleSolution(attemptForm.getTaskId(),attemptForm.getSolutionsId()));
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());
