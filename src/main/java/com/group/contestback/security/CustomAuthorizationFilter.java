@@ -37,7 +37,8 @@ public class CustomAuthorizationFilter extends OncePerRequestFilter {
             "swagger-resources",
             "configuration",
             "swagger-ui.html",
-            "webjars"
+            "webjars",
+            "/api/user/add"
     };
 
     public CustomAuthorizationFilter(String secret) {

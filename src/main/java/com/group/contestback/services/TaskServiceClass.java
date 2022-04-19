@@ -52,7 +52,11 @@ public class TaskServiceClass implements TaskService{
     }
 
     private void fillTasks(List<TaskResponse> taskResponses, Tasks task, TaskResponse taskResponse) {
-        taskResponse.setTask(task);
+        try{
+            taskResponse.setTask(new Tasks(task.getId(), task.getName(),task.getDescription(), "", task.getDeadLine(),task.getTaskTypeId()));
+        } catch (Exception e) {
+            log.error(e.getMessage());
+        }
         List<SolutionVariants> solutionVariants = solutionVariantsRepo.findAllByTaskId(task.getId());
         for(int k = 0; k < solutionVariants.size(); ++k) {
             taskResponse.addSolutionVariant(solutionVariants.get(k).getId(), solutionVariants.get(k).getSolution(), solutionVariants.get(k).getTaskId());

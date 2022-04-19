@@ -43,8 +43,10 @@ public class UserController {
     }
     @ApiOperation(value = "Добавляет нового пользователя", notes = "Роли указывать необязательно, для этого существует другой запрос")
     @PostMapping("/user/add")
-    public ResponseEntity<AppUser> addUsers(@RequestBody AppUser user) {
-        return ResponseEntity.ok().body(userService.saveAppUser(user));
+    public ResponseEntity<AppUser> addUsers(@RequestBody UserRegistration user) {
+        AppUser appUser = new AppUser(user.getFirstName(),user.getLastName(),user.getMiddleName(),user.getLogin(),
+                user.getPassword(), "", user.getEmail(), 2, null);
+        return ResponseEntity.ok().body(userService.saveAppUser(appUser));
     }
     @ApiOperation(value = "Добавляет роль к пользователю")
     @PostMapping("/user/addrole")
@@ -64,6 +66,15 @@ public class UserController {
         userService.addEmailToUser(form.getLogin(), form.getEmail());
         return ResponseEntity.ok().build();
     }
+}
+@Data
+class UserRegistration {
+    private String firstName;
+    private String middleName;
+    private String lastName;
+    private String login;
+    private String password;
+    private String email;
 }
 @Data
 class RoleToUserForm {

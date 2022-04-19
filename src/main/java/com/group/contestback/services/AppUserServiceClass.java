@@ -7,6 +7,7 @@ import com.group.contestback.models.Roles;
 import com.group.contestback.repositories.AppUserRepo;
 import com.group.contestback.repositories.GroupsRepo;
 import com.group.contestback.repositories.RolesRepo;
+import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,6 +39,7 @@ public class AppUserServiceClass implements AppUserService, UserDetailsService {
     private EmailServiceCS emailServiceCS;
     @Override
     public AppUser saveAppUser(AppUser user) {
+        log.info("Save app user" + user.getPassHash());
         user.setPassHash(passwordEncoder.encode(user.getPassHash()));
         log.info("Registering new user" + user.getLogin() + " " + user.getEmail());
         Mails mails = new Mails(user.getEmail(),"Вы были успешно зарегистрированы",new Date());
@@ -112,4 +114,13 @@ public class AppUserServiceClass implements AppUserService, UserDetailsService {
         rolesRepo.findAllById(user.getRoleId()).forEach(role-> authorities.add(new SimpleGrantedAuthority(role.getName())));
         return new User(user.getLogin(), user.getPassHash(), authorities);
     }
+}
+@Data
+class UserRegistration {
+    private String firstName;
+    private String middleName;
+    private String lastName;
+    private String login;
+    private String password;
+    private String email;
 }
