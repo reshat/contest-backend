@@ -37,7 +37,7 @@ public class TaskController {
     @ApiOperation(value = "Добавляет новое задание")
     @PostMapping("/addtask")
     public ResponseEntity<?> addTask(@RequestBody addTaskForm form) {
-        taskService.addTask(form.getName(), form.getSolution(), form.getDeadline(), form.getDescription(), form.getTaskTypeId());
+        taskService.addTask(form.getName(), form.getSolution(), form.getDescription(), form.getTaskTypeId());
         return ResponseEntity.ok().build();
     }
     @ApiOperation(value = "Возращает все задания")
@@ -101,7 +101,6 @@ public class TaskController {
 class addTaskForm {
     private String name;
     private String solution;
-    private String deadline;
     private String description;
     private Integer taskTypeId;
 }

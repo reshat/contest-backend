@@ -24,6 +24,7 @@ public class Comments {
     private Date date;
     private Boolean deleted;
     private String comment;
+    @Column(name="courseid")
     private Integer courseId;
 
     public Comments(Integer toTaskId, Integer fromUserId, String solution, Integer courseId) {

@@ -15,9 +15,9 @@ public interface ScoresService {
     List<Scores> getAllScores();
     void addAttempt(Attempts attempt);
     List<Attempts> getAllAttempts();
-    ResultsResponse checkSQLSolution(Integer taskId, String solution) throws ParseException;
-    ResultScoreResponse checkSQLSolutionScore(Integer taskId, String solution) throws ParseException;
-    Integer checkSimpleSolution(Integer taskId, List<Integer> solutionsId);
+    ResultsResponse checkSQLSolution(Integer taskId, Integer courseId, String solution) throws ParseException;
+    ResultScoreResponse checkSQLSolutionScore(Integer taskId, Integer courseId, String solution) throws ParseException;
+    Integer checkSimpleSolution(Integer taskId, Integer courseId, List<Integer> solutionsId);
     List<Scores> getStudentScores();
     List<Scores> getGroupScoresForTask(Integer groupId, Integer taskId);
     List<Attempts> getStudentAttemptsOnTask(Integer taskId);

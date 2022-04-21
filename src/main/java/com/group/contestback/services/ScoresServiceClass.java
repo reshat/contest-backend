@@ -108,7 +108,7 @@ public class ScoresServiceClass implements ScoresService{
     }
 
     @Override
-    public ResultsResponse checkSQLSolution(Integer taskId, String solution) {
+    public ResultsResponse checkSQLSolution(Integer taskId, Integer courseId, String solution) {
         ResultsResponse resultsResponse = new ResultsResponse();
         Integer userId = appUserRepo.findByLogin(SecurityContextHolder.getContext().getAuthentication().getPrincipal().toString()).getId();
         Tasks task = tasksRepo.findById(taskId).get();
@@ -119,9 +119,9 @@ public class ScoresServiceClass implements ScoresService{
             throw new RuntimeException("Wrong request for task type");
         }
 
-        if((task.getDeadLine().getTime() - new Date().getTime() < 0)) {
-            throw new RuntimeException("The deadline expired");
-        }
+//        if((task.getDeadLine().getTime() - new Date().getTime() < 0)) {
+//            throw new RuntimeException("The deadline expired");
+//        }
         Comparator<Attempts> comparator = (p1, p2) -> (int) (p2.getTime().getTime() - p1.getTime().getTime());
         attempts.sort(comparator);
 
@@ -148,14 +148,14 @@ public class ScoresServiceClass implements ScoresService{
             resultsResponse.setTimeout((attempts.size() + 1)*60*1000);
         }
 
-        Attempts attempt = new Attempts(userId, taskId, false, solution);
+        Attempts attempt = new Attempts(userId, taskId, false, solution, courseId);
         attemptsRepo.save(attempt);
 
         return resultsResponse;
     }
 
     @Override
-    public ResultScoreResponse checkSQLSolutionScore(Integer taskId, String solution) {
+    public ResultScoreResponse checkSQLSolutionScore(Integer taskId, Integer courseId, String solution) {
         ResultScoreResponse resultsResponse = new ResultScoreResponse();
         Integer userId = appUserRepo.findByLogin(SecurityContextHolder.getContext().getAuthentication().getPrincipal().toString()).getId();
         Tasks task = tasksRepo.findById(taskId).get();
@@ -166,9 +166,9 @@ public class ScoresServiceClass implements ScoresService{
             throw new RuntimeException("Wrong request for task type");
         }
 
-        if((task.getDeadLine().getTime() - new Date().getTime() < 0)) {
-            throw new RuntimeException("The deadline expired");
-        }
+//        if((task.getDeadLine().getTime() - new Date().getTime() < 0)) {
+//            throw new RuntimeException("The deadline expired");
+//        }
         Comparator<Scores> comparator = (p1, p2) -> (int) (p2.getDate().getTime() - p1.getDate().getTime());
         scores.sort(comparator);
 
@@ -249,7 +249,7 @@ public class ScoresServiceClass implements ScoresService{
             if(noHiddenTestError && noOpenTestsError) {
                 score = 5;
             }
-            scoresRepo.save(new Scores(userId, taskId, score, 1,solution));
+            scoresRepo.save(new Scores(userId, taskId, score, 1,solution, courseId));
 
         } else {
             resultsResponse.setTimeout((scores.size() + 1)*60*1000);
@@ -258,7 +258,7 @@ public class ScoresServiceClass implements ScoresService{
     }
 
     @Override
-    public Integer checkSimpleSolution(Integer taskId, List<Integer> solutionsId) {
+    public Integer checkSimpleSolution(Integer taskId, Integer courseId, List<Integer> solutionsId) {
         Integer userId = appUserRepo.findByLogin(SecurityContextHolder.getContext().getAuthentication().getPrincipal().toString()).getId();
         Tasks task = tasksRepo.findById(taskId).get();
         List<Attempts> attempts = attemptsRepo.findAllByTaskIdAndUserId(taskId,userId);
@@ -269,9 +269,9 @@ public class ScoresServiceClass implements ScoresService{
         if(attempts.size() > 0) {
             throw new RuntimeException("Only 1 attempt allowed");
         }
-        if(task.getDeadLine().getTime() - new Date().getTime() < 0) {
-            throw new RuntimeException("The deadline expired");
-        }
+//        if(task.getDeadLine().getTime() - new Date().getTime() < 0) {
+//            throw new RuntimeException("The deadline expired");
+//        }
 
 
         // SIMPLE_TASK - only 1 attempt
@@ -300,9 +300,9 @@ public class ScoresServiceClass implements ScoresService{
         if(result < 1) {
             result = 1;
         }
-        Attempts attempt = new Attempts(userId, taskId, result == 5, solutionsId.toString());
+        Attempts attempt = new Attempts(userId, taskId, result == 5, solutionsId.toString(), courseId);
         attemptsRepo.save(attempt);
-        Scores score = new Scores(userId, taskId, result, 1, solutionsId.toString());
+        Scores score = new Scores(userId, taskId, result, 1, solutionsId.toString(), courseId);
         scoresRepo.save(score);
         return result;
     }
@@ -339,7 +339,7 @@ public class ScoresServiceClass implements ScoresService{
                 }
             });
             if(resSize == result.size() && rolesRepo.getById(appUser.getRoleId()).getName().equals("ROLE_USER")){
-                result.add(new Scores(null,appUser.getId(),taskId,null,null,null,null));
+                result.add(new Scores(null,appUser.getId(),taskId,null,null,null,null, null));
             }
         });
         return result;
@@ -367,7 +367,7 @@ public class ScoresServiceClass implements ScoresService{
                         scores.sort(comparator);
                         userScores.add(scores.get(0));
                     } else {
-                        Scores nullScore = new Scores(user.getId(),taskCourse.getTaskId(),null,null,null);
+                        Scores nullScore = new Scores(user.getId(),taskCourse.getTaskId(),null,null,null, null);
                         userScores.add(nullScore);
                     }
                 }

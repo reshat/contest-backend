@@ -25,12 +25,15 @@ public class Attempts {
     private Date time;
     private Boolean succeeded;
     private String solution;
+    @Column(name="courseid")
+    private Integer courseId;
 
-    public Attempts(Integer userId, Integer taskId, Boolean succeeded, String solution) {
+    public Attempts(Integer userId, Integer taskId, Boolean succeeded, String solution, Integer courseId) {
         this.userId = userId;
         this.taskId = taskId;
         this.time = new Date();
         this.succeeded = succeeded;
         this.solution = solution;
+        this.courseId = courseId;
     }
 }

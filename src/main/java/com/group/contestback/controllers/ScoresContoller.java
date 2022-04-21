@@ -37,7 +37,8 @@ public class ScoresContoller {
     @PostMapping("/addScore")
     public ResponseEntity<?> addScore(@RequestBody ScoreForm scoreForm) {
         try {
-            Scores score = new Scores(scoreForm.getUserId(),scoreForm.getTaskId(),scoreForm.getScore(),scoreForm.getTeacherId(),scoreForm.getSolution());
+            Scores score = new Scores(scoreForm.getUserId(),scoreForm.getTaskId(),
+                    scoreForm.getScore(),scoreForm.getTeacherId(),scoreForm.getSolution(), scoreForm.getCourseId());
             scoresService.addScore(score);
             return ResponseEntity.ok().build();
         } catch (Exception e) {
@@ -85,7 +86,7 @@ public class ScoresContoller {
     @PostMapping("/addSQLAttemptScore")
     public ResponseEntity<?> addSQLAttemptScore(@RequestBody AttemptSQLForm attemptForm) {
         try {
-            return ResponseEntity.ok().body(scoresService.checkSQLSolutionScore(attemptForm.getTaskId(),attemptForm.getSolution()));
+            return ResponseEntity.ok().body(scoresService.checkSQLSolutionScore(attemptForm.getTaskId(), attemptForm.getCourseId(),attemptForm.getSolution()));
         } catch (Exception e) {
             return ResponseEntity.badRequest().header("error", e.getMessage()).body(e.getMessage());
         }
@@ -94,7 +95,7 @@ public class ScoresContoller {
     @PostMapping("/addSQLAttempt")
     public ResponseEntity<?> addSQLAttempt(@RequestBody AttemptSQLForm attemptForm) {
         try {
-            return ResponseEntity.ok().body(scoresService.checkSQLSolution(attemptForm.getTaskId(),attemptForm.getSolution()));
+            return ResponseEntity.ok().body(scoresService.checkSQLSolution(attemptForm.getTaskId(), attemptForm.getCourseId(),attemptForm.getSolution()));
         } catch (Exception e) {
             return ResponseEntity.badRequest().header("error", e.getMessage()).body(e.getMessage());
         }
@@ -103,7 +104,7 @@ public class ScoresContoller {
     @PostMapping("/addSimpleAttempt")
     public ResponseEntity<?> addSimpleAttempt(@RequestBody AttemptSimpleForm attemptForm) {
         try {
-            return ResponseEntity.ok().body(scoresService.checkSimpleSolution(attemptForm.getTaskId(),attemptForm.getSolutionsId()));
+            return ResponseEntity.ok().body(scoresService.checkSimpleSolution(attemptForm.getTaskId(), attemptForm.getCourseId(),attemptForm.getSolutionsId()));
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
@@ -122,15 +123,18 @@ class ScoreForm {
     private Integer score;
     private Integer teacherId;
     private String solution;
+    private Integer courseId;
 }
 @Data
 class AttemptSQLForm {
     private Integer taskId;
+    private Integer courseId;
     private String solution;
 }
 @Data
 class AttemptSimpleForm {
     private Integer taskId;
+    private Integer courseId;
     private List<Integer> solutionsId;
 }
 @Data

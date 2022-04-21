@@ -20,7 +20,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 @Transactional
 @Slf4j
-public class TaskServiceClass implements TaskService{
+public class TaskServiceClass implements TaskService {
     private final TasksRepo tasksRepo;
     private final TaskTypesRepo taskTypesRepo;
     private final AppUserService appUserService;
@@ -43,9 +43,9 @@ public class TaskServiceClass implements TaskService{
     }
 
     @Override
-    public void addTask(String name, String solution, String deadline, String description, Integer taskTypeId){
+    public void addTask(String name, String solution, String description, Integer taskTypeId) {
         try {
-            Tasks tasks = new Tasks(name, solution, deadline, description, taskTypeId);
+            Tasks tasks = new Tasks(name, solution, description, taskTypeId);
             tasksRepo.save(tasks);
         } catch (Exception e) {
             log.error(e.getMessage());
@@ -53,13 +53,13 @@ public class TaskServiceClass implements TaskService{
     }
 
     private void fillTasks(List<TaskResponse> taskResponses, Tasks task, TaskResponse taskResponse) {
-        try{
-            taskResponse.setTask(new Tasks(task.getId(), task.getName(),task.getDescription(), "", task.getDeadLine(),task.getTaskTypeId()));
+        try {
+            taskResponse.setTask(new Tasks(task.getId(), task.getName(), task.getDescription(), "", task.getTaskTypeId()));
         } catch (Exception e) {
             log.error(e.getMessage());
         }
         List<SolutionVariants> solutionVariants = solutionVariantsRepo.findAllByTaskId(task.getId());
-        for(int k = 0; k < solutionVariants.size(); ++k) {
+        for (int k = 0; k < solutionVariants.size(); ++k) {
             taskResponse.addSolutionVariant(solutionVariants.get(k).getId(), solutionVariants.get(k).getSolution(), solutionVariants.get(k).getTaskId());
         }
         taskResponses.add(taskResponse);
@@ -69,7 +69,7 @@ public class TaskServiceClass implements TaskService{
     public List<TaskResponse> getTasks() {
         List<TaskResponse> taskResponses = new ArrayList<>();
         List<Tasks> tasks = tasksRepo.findAll();
-        for(Tasks task: tasks) {
+        for (Tasks task : tasks) {
             TaskResponse taskResponse = new TaskResponse();
             fillTasks(taskResponses, task, taskResponse);
         }
@@ -80,7 +80,7 @@ public class TaskServiceClass implements TaskService{
     public List<TaskResponse> getTasksByCourse(Integer courseId) {
         List<TaskResponse> taskResponses = new ArrayList<>();
         List<TaskCourses> taskCourses = taskCoursesRepo.findAllByCourseId(courseId);
-        for(int i = 0; i < taskCourses.size(); ++i) {
+        for (int i = 0; i < taskCourses.size(); ++i) {
             TaskResponse taskResponse = new TaskResponse();
             Tasks task = tasksRepo.findById(taskCourses.get(i).getTaskId()).get();
             fillTasks(taskResponses, task, taskResponse);
@@ -104,9 +104,9 @@ public class TaskServiceClass implements TaskService{
     public String addTaskToCourse(Integer taskId, Integer courseId) {
         Optional<Tasks> task = tasksRepo.findById(taskId);
         Optional<Courses> course = coursesRepo.findById(courseId);
-        if(task.isEmpty()) {
+        if (task.isEmpty()) {
             log.error("there is no task with this id");
-        } else if(course.isEmpty()) {
+        } else if (course.isEmpty()) {
             log.error("there is no course with this id");
         } else {
             TaskCourses taskCourses = new TaskCourses(taskId, courseId);
@@ -130,12 +130,12 @@ public class TaskServiceClass implements TaskService{
     public List<GroupCoursesWithNames> getAllGroupCourses() {
         List<GroupCoursesWithNames> groupCoursesWithNames = new ArrayList<>();
         groupCoursesRepo.findAll().forEach(groupCourses -> groupCoursesWithNames.add(new GroupCoursesWithNames(
-                groupCourses.getId()
-                ,coursesRepo.getById(groupCourses.getCourseId()).getName(),
-                groupCourses.getCourseId(),
-                groupsRepo.getById(groupCourses.getGroupId()).getNumber(),
-                groupCourses.getGroupId()
-        ))
+                        groupCourses.getId()
+                        , coursesRepo.getById(groupCourses.getCourseId()).getName(),
+                        groupCourses.getCourseId(),
+                        groupsRepo.getById(groupCourses.getGroupId()).getNumber(),
+                        groupCourses.getGroupId()
+                ))
         );
         return groupCoursesWithNames;
     }
@@ -144,10 +144,10 @@ public class TaskServiceClass implements TaskService{
     public String addGroupOnCourse(Integer courseId, Integer groupId) {
         Optional<Courses> courses = coursesRepo.findById(courseId);
         Optional<Groups> groups = groupsRepo.findById(groupId);
-        if(courses.isEmpty()) {
+        if (courses.isEmpty()) {
             log.error("there is no course with this id");
             return "there is no course with this id";
-        } else if(groups.isEmpty()) {
+        } else if (groups.isEmpty()) {
             log.error("there is no group with this id");
             return "there is no group with this id";
         } else {
@@ -164,7 +164,7 @@ public class TaskServiceClass implements TaskService{
                 = groupCoursesRepo.findAllByGroupId(appUser.getGroupId());
         List<Courses> courses = new ArrayList<>();
 
-        for(int i = 0; i < groupCourses.size(); ++i) {
+        for (int i = 0; i < groupCourses.size(); ++i) {
             Courses courses1 = coursesRepo.findById(groupCourses.get(i).getCourseId()).get();
             courses.add(courses1);
         }
@@ -176,8 +176,3 @@ public class TaskServiceClass implements TaskService{
         return studentTaskResponse;
     }
 }
-//    private Integer id;
-//    private String courseName;
-//    private Integer courseId;
-//    private String groupName;
-//    private Integer groupId;

@@ -20,18 +20,16 @@ public class Tasks {
     private String name;
     private String description;
     private String solution;
-    private Date deadLine;
     @Column(name="tasktypeid")
     private Integer taskTypeId;
 
-    public Tasks(String name, String solution, String deadline, String description, Integer taskTypeId) throws ParseException {
+    public Tasks(String name, String solution, String description, Integer taskTypeId) throws ParseException {
         this.name = name;
         this.solution = solution;
         //"30-03-2022 23:37:50";
 
         SimpleDateFormat formatter=new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
 
-        this.deadLine = formatter.parse(deadline);
         this.description = description;
         this.taskTypeId = taskTypeId;
     }

@@ -13,7 +13,7 @@ import java.util.List;
 public interface TaskService {
     void addTaskType(String name);
     List<TaskTypes> getTaskTypes();
-    void addTask(String name, String solution, String deadline, String description, Integer taskTypeId);
+    void addTask(String name, String solution, String description, Integer taskTypeId);
     List<TaskResponse> getTasks();
     List<TaskResponse> getTasksByCourse(Integer courseId);
     List<Courses> getAllCourses();

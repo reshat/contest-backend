@@ -26,13 +26,16 @@ public class Scores {
     @Column(name="teacherid")
     private Integer teacherId;
     private String solution;
+    @Column(name="courseid")
+    private Integer courseId;
 
-    public Scores(Integer userId, Integer taskId, Integer score, Integer teacherId, String solution) {
+    public Scores(Integer userId, Integer taskId, Integer score, Integer teacherId, String solution, Integer courseId) {
         this.userId = userId;
         this.taskId = taskId;
         this.score = score;
         this.date = new Date();
         this.teacherId = teacherId;
         this.solution = solution;
+        this.courseId = courseId;
     }
 }
