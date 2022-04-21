@@ -7,9 +7,11 @@ import com.group.contestback.models.Roles;
 import com.group.contestback.repositories.AppUserRepo;
 import com.group.contestback.repositories.GroupsRepo;
 import com.group.contestback.repositories.RolesRepo;
+import com.group.contestback.responseTypes.UserPageResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.convert.converter.Converter;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -22,6 +24,7 @@ import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.util.*;
+import java.util.function.Function;
 
 @Service @RequiredArgsConstructor @Transactional @Slf4j
 public class AppUserServiceClass implements AppUserService, UserDetailsService {
@@ -66,13 +69,47 @@ public class AppUserServiceClass implements AppUserService, UserDetailsService {
     }
 
     @Override
-    public Page<AppUser> getUsersPage(int page, int pageSize) {
-        return userRepo.findAll(PageRequest.of(page, pageSize));
+    public Page<UserPageResponse> getUsersPage(int page, int pageSize) {
+        Page<AppUser> entities = userRepo.findAll(PageRequest.of(page, pageSize));
+        List<Roles> roleNameToId = rolesRepo.findAll();
+        List<Groups> groupNameToId = groupsRepo.findAll();
+
+        Page<UserPageResponse> dtoPage = entities.map(new Function<AppUser, UserPageResponse>() {
+            @Override
+            public UserPageResponse apply(AppUser entity) {
+                UserPageResponse dto = new UserPageResponse(entity.getId(), entity.getFirstName(),entity.getLastName(),entity.getMiddleName(),
+                        entity.getLogin(),entity.getEmail(),entity.getRoleId(),entity.getGroupId(),
+                        roleNameToId.stream().filter(role -> role.getId().equals(entity.getRoleId()))
+                                .findAny()
+                                .orElse(new Roles()).getName(),
+                        groupNameToId.stream().filter(group -> group.getId().equals(entity.getGroupId()))
+                                .findAny().orElse(new Groups()).getNumber());
+                return dto;
+            }
+        });
+        return dtoPage;
     }
 
     @Override
-    public Page<AppUser> findUsersByLastNamePage(int page, int pageSize, String str) {
-        return userRepo.nameSearch('%' + str + '%', PageRequest.of(page,pageSize));
+    public Page<UserPageResponse> findUsersByLastNamePage(int page, int pageSize, String str) {
+        Page<AppUser> entities = userRepo.nameSearch('%' + str + '%', PageRequest.of(page,pageSize));
+        List<Roles> roleNameToId = rolesRepo.findAll();
+        List<Groups> groupNameToId = groupsRepo.findAll();
+
+        Page<UserPageResponse> dtoPage = entities.map(new Function<AppUser, UserPageResponse>() {
+            @Override
+            public UserPageResponse apply(AppUser entity) {
+                UserPageResponse dto = new UserPageResponse(entity.getId(), entity.getFirstName(),entity.getLastName(),entity.getMiddleName(),
+                        entity.getLogin(),entity.getEmail(),entity.getRoleId(),entity.getGroupId(),
+                        roleNameToId.stream().filter(role -> role.getId().equals(entity.getRoleId()))
+                                .findAny()
+                                .orElse(new Roles()).getName(),
+                        groupNameToId.stream().filter(group -> group.getId().equals(entity.getGroupId()))
+                                .findAny().orElse(new Groups()).getNumber());
+                return dto;
+            }
+        });
+        return dtoPage;
     }
 
     @Override

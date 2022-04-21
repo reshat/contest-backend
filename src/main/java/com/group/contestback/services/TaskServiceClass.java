@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -170,6 +171,8 @@ public class TaskServiceClass implements TaskService{
         StudentTaskResponse studentTaskResponse = new StudentTaskResponse();
         studentTaskResponse.setUserId(appUser.getId());
         studentTaskResponse.setCourses(courses);
+        studentTaskResponse.setCompletion(100);// to do later
+        studentTaskResponse.setNearestDeadline(new Date()); // to do later
         return studentTaskResponse;
     }
 }

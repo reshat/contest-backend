@@ -1,6 +1,7 @@
 package com.group.contestback.controllers;
 
 import com.group.contestback.models.AppUser;
+import com.group.contestback.responseTypes.UserPageResponse;
 import com.group.contestback.services.AppUserService;
 import com.group.contestback.services.EmailServiceCS;
 import io.swagger.annotations.Api;
@@ -33,12 +34,12 @@ public class UserController {
     }
     @ApiOperation(value = "Возращает определенную страницу, определенного размера пользователей")
     @GetMapping("/usersPage")
-    public ResponseEntity<Page<AppUser>> getUsersPage(@RequestBody PageSize pageSize) {
+    public ResponseEntity<Page<UserPageResponse>> getUsersPage(@RequestBody PageSize pageSize) {
         return ResponseEntity.ok().body(userService.getUsersPage(pageSize.getPage(), pageSize.getPageSize()));
     }
     @ApiOperation(value = "Возращает определенную страницу, определенного размера пользователей")
     @GetMapping("/usersPageFind")
-    public ResponseEntity<Page<AppUser>> getUsersPageFind(@RequestBody PageSizeName pageSizeName) {
+    public ResponseEntity<Page<UserPageResponse>> getUsersPageFind(@RequestBody PageSizeName pageSizeName) {
         return ResponseEntity.ok().body(userService.findUsersByLastNamePage(pageSizeName.getPage(), pageSizeName.getPageSize(), pageSizeName.getStr()));
     }
     @ApiOperation(value = "Добавляет нового пользователя", notes = "Роли указывать необязательно, для этого существует другой запрос")
