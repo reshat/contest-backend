@@ -88,7 +88,7 @@ public class ScoresServiceClass implements ScoresService{
 
         List<List<String>> result = new ArrayList<>();
 
-        List<String> columnNameRow = new ArrayList<>();
+        List<String> columnNameRow = new ArrayList<>();// To change
 
         for (int i = 1; i <= columnCount; ++i) {
             columnNameRow.add(resultSetMetaData.getColumnName(i));
@@ -300,7 +300,7 @@ public class ScoresServiceClass implements ScoresService{
         if(result < 1) {
             result = 1;
         }
-        Attempts attempt = new Attempts(userId, taskId, result == 5? true : false, solutionsId.toString());
+        Attempts attempt = new Attempts(userId, taskId, result == 5, solutionsId.toString());
         attemptsRepo.save(attempt);
         Scores score = new Scores(userId, taskId, result, 1, solutionsId.toString());
         scoresRepo.save(score);

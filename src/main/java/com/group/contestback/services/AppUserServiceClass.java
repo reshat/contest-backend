@@ -7,13 +7,11 @@ import com.group.contestback.models.Roles;
 import com.group.contestback.repositories.AppUserRepo;
 import com.group.contestback.repositories.GroupsRepo;
 import com.group.contestback.repositories.RolesRepo;
-import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -24,9 +22,6 @@ import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.util.*;
-import java.util.function.Predicate;
-
-import static org.hibernate.criterion.Restrictions.like;
 
 @Service @RequiredArgsConstructor @Transactional @Slf4j
 public class AppUserServiceClass implements AppUserService, UserDetailsService {
@@ -114,13 +109,4 @@ public class AppUserServiceClass implements AppUserService, UserDetailsService {
         rolesRepo.findAllById(user.getRoleId()).forEach(role-> authorities.add(new SimpleGrantedAuthority(role.getName())));
         return new User(user.getLogin(), user.getPassHash(), authorities);
     }
-}
-@Data
-class UserRegistration {
-    private String firstName;
-    private String middleName;
-    private String lastName;
-    private String login;
-    private String password;
-    private String email;
 }
