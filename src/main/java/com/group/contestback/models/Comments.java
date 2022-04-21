@@ -23,14 +23,16 @@ public class Comments {
     private Integer fromUserId;
     private Date date;
     private Boolean deleted;
-    private String solution;
+    private String comment;
+    private Integer courseId;
 
-    public Comments(Integer toTaskId, Integer fromUserId, String solution) {
+    public Comments(Integer toTaskId, Integer fromUserId, String solution, Integer courseId) {
         this.toTaskId = toTaskId;
         this.fromUserId = fromUserId;
-        this.solution = solution;
+        this.comment = solution;
         this.deleted = false;
         this.date = new Date();
+        this.courseId = courseId;
         //this.date = java.sql.Date.valueOf(String.valueOf(LocalDateTime.now()));
     }
 }

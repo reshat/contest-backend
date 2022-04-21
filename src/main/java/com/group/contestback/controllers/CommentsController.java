@@ -25,9 +25,9 @@ public class CommentsController {
     private final CommentsService commentsService;
     @ApiOperation(value = "Добавляет новый комментарий")
     @PostMapping("/addComment")
-    public ResponseEntity<?> addScore(@RequestBody CommentsForm commentsForm) {
+    public ResponseEntity<?> addComment(@RequestBody CommentsForm commentsForm) {
         try {
-            Comments comment = new Comments(commentsForm.getToTaskId(), commentsForm.getFromUserId(), commentsForm.getSolution());
+            Comments comment = new Comments(commentsForm.getToTaskId(), commentsForm.getFromUserId(), commentsForm.getComment(), commentsForm.getCourseId());
             log.info(comment.toString());
             commentsService.addComment(comment);
             return ResponseEntity.ok().build();
@@ -55,6 +55,7 @@ public class CommentsController {
 @Data
 class CommentsForm {
     private Integer toTaskId;
+    private Integer courseId;
     private Integer fromUserId;
-    private String solution;
+    private String comment;
 }
