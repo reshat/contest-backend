@@ -22,5 +22,5 @@ public interface ScoresService {
     List<Scores> getGroupScoresForTask(Integer groupId, Integer taskId);
     List<Attempts> getStudentAttemptsOnTask(Integer taskId);
     GroupCoursesScoresResponse getGroupScoresForCourse(Integer groupId, Integer taskId);
-    List<GroupStudents> getAllManualAttempts();
+    List<GroupStudents> getAllManualAttempts(String courseId);
 }

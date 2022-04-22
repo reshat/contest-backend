@@ -49,6 +49,10 @@ public class ScoresServiceClass implements ScoresService{
 
     @Override
     public void addScore(Scores score) {
+        List<Attempts> attempts = attemptsRepo.findAllByTaskIdAndUserId(score.getTaskId(),score.getUserId());
+        Comparator<Attempts> comparator = (p1, p2) -> (int) (p2.getTime().getTime() - p1.getTime().getTime());
+        attempts.sort(comparator);
+        score.setSolution(attempts.get(0).getSolution());
         scoresRepo.save(score);
     }
 
@@ -365,7 +369,7 @@ public class ScoresServiceClass implements ScoresService{
                 }
             });
             if(resSize == result.size() && rolesRepo.getById(appUser.getRoleId()).getName().equals("ROLE_USER")){
-                result.add(new Scores(null,appUser.getId(),taskId,null,null,null,null, null));
+                result.add(new Scores(null,appUser.getId(),taskId,null,null,null,null,null, null));
             }
         });
         return result;
@@ -404,7 +408,7 @@ public class ScoresServiceClass implements ScoresService{
     }
 
     @Override
-    public List<GroupStudents> getAllManualAttempts() {
+    public List<GroupStudents> getAllManualAttempts(String courseId) {
         List<GroupStudents> groupStudents = new ArrayList<>();
         List<Groups> groups = groupsRepo.findAll();
         List<Tasks> manualTasks = tasksRepo.findAllByTaskTypeId(3);
@@ -418,7 +422,7 @@ public class ScoresServiceClass implements ScoresService{
             groupStud.setGroups(group);
             List<AppUser> users = appUserRepo.findAllByGroupId(group.getId());
             for(AppUser user: users) {
-                List<Attempts> attempts = attemptsRepo.findByTaskUserMaxTime(user.getId());
+                List<Attempts> attempts = attemptsRepo.findByTaskUserMaxTime(user.getId(), Integer.parseInt(courseId));
                 List<Attempts> manualLastAttempts = new ArrayList<>();
                 for(Attempts attempt: attempts) {
                     if(manualTasksIds.contains(attempt.getTaskId())) {

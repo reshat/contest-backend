@@ -28,14 +28,15 @@ public class Scores {
     private String solution;
     @Column(name="courseid")
     private Integer courseId;
+    private String review;
 
-    public Scores(Integer userId, Integer taskId, Integer score, Integer teacherId, String solution, Integer courseId) {
+    public Scores(Integer userId, Integer taskId, Integer score, Integer teacherId, String review, Integer courseId) {
         this.userId = userId;
         this.taskId = taskId;
         this.score = score;
         this.date = new Date();
         this.teacherId = teacherId;
-        this.solution = solution;
+        this.review = review;
         this.courseId = courseId;
     }
 }

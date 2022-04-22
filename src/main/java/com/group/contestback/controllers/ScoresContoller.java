@@ -38,7 +38,7 @@ public class ScoresContoller {
     public ResponseEntity<?> addScore(@RequestBody ScoreForm scoreForm) {
         try {
             Scores score = new Scores(scoreForm.getUserId(),scoreForm.getTaskId(),
-                    scoreForm.getScore(),scoreForm.getTeacherId(),scoreForm.getSolution(), scoreForm.getCourseId());
+                    scoreForm.getScore(),scoreForm.getTeacherId(),scoreForm.getReview(), scoreForm.getCourseId());
             scoresService.addScore(score);
             return ResponseEntity.ok().build();
         } catch (Exception e) {
@@ -65,8 +65,8 @@ public class ScoresContoller {
 
     @ApiOperation(value = "Возращает по группам непроверяемые попытки")
     @GetMapping("/allManualAttempts")
-    public ResponseEntity<?> getAllManualAttempts() {
-        return ResponseEntity.ok().body(scoresService.getAllManualAttempts());
+    public ResponseEntity<?> getAllManualAttempts(@RequestBody String courseId) {
+        return ResponseEntity.ok().body(scoresService.getAllManualAttempts(courseId));
     }
 
 
@@ -122,7 +122,7 @@ class ScoreForm {
     private Integer taskId;
     private Integer score;
     private Integer teacherId;
-    private String solution;
+    private String review;
     private Integer courseId;
 }
 @Data
