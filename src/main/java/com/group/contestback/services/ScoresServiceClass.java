@@ -147,22 +147,71 @@ public class ScoresServiceClass implements ScoresService{
 
         // SQL_TASK - attempts restricted by time, but results are shown immediately
         // MANUAL_TASK - attempts restricted by time
+        boolean succeded = true;
         if(taskType.equals("SQL_TASK")) {
 
             try {
                 List<List<String>> studentResults = runSQLQueryUser(solution, "opentests");
                 resultsResponse.setOpenResult(studentResults);
+                List<List<String>> teacherResults = runSQLQueryUser(tasksRepo.findById(taskId).get().getSolution(), "opentests");
+
+                if(studentResults.size() != teacherResults.size()) {
+                    succeded = false;
+                }
+
+                if(!studentResults.equals(teacherResults)) {
+                    succeded = false;
+                }
 
             } catch (Exception e) {
                 log.error(e.getMessage());
+                succeded = false;
             }
+
 
             resultsResponse.setTimeout((attempts.size() + 1)*60*1000);
         } else {
+            boolean noOpenTestsError = true;
+            boolean noHiddenTestError = true;
+
+            try {
+
+                List<List<String>> studentResults = runSQLQueryUser(solution, "opentests");
+                List<List<String>> teacherResults = runSQLQueryUser(tasksRepo.findById(taskId).get().getSolution(), "opentests");
+
+                if(studentResults.size() != teacherResults.size()) {
+                    noOpenTestsError = false;
+                }
+
+                if(!studentResults.equals(teacherResults)) {
+                    noOpenTestsError = false;
+                }
+            } catch (Exception e) {
+                log.error(e.getMessage());
+                noOpenTestsError = false;
+            }
+            try {
+                List<List<String>> studentResults = runSQLQueryUser(solution, "hiddenTests");
+                List<List<String>> teacherResults = runSQLQueryUser(tasksRepo.findById(taskId).get().getSolution(), "hiddenTests");
+                if(studentResults.size() != teacherResults.size()) {
+                    noHiddenTestError = false;
+                }
+
+                if(!studentResults.equals(teacherResults)) {
+                    noHiddenTestError = false;
+                }
+            } catch (Exception e) {
+                log.error(e.getMessage());
+                noHiddenTestError = false;
+            }
+
+            if(noHiddenTestError && noOpenTestsError) {
+                succeded = true;
+            }
             resultsResponse.setTimeout((attempts.size() + 1)*60*1000);
         }
 
-        Attempts attempt = new Attempts(userId, taskId, false, solution, courseId);
+        Attempts attempt = new Attempts(userId, taskId, succeded, solution, courseId);
         attemptsRepo.save(attempt);
 
         return resultsResponse;
@@ -181,7 +230,7 @@ public class ScoresServiceClass implements ScoresService{
         }))) {
             throw new RuntimeException("This task is not on this course");
         }
-        if(!(taskType.equals("SQL_TASK") || taskType.equals("MANUAL_TASK"))) {
+        if(!(taskType.equals("SQL_TASK"))) {
             throw new RuntimeException("Wrong request for task type");
         }
 
@@ -271,7 +320,7 @@ public class ScoresServiceClass implements ScoresService{
             if(noHiddenTestError && noOpenTestsError) {
                 score = 5;
             }
-            scoresRepo.save(new Scores(userId, taskId, score, 1,solution, courseId));
+            scoresRepo.save(new Scores(userId, taskId, score, 1, courseId, solution));
 
         } else {
             resultsResponse.setTimeout((scores.size() + 1)*60*1000);
@@ -386,9 +435,13 @@ public class ScoresServiceClass implements ScoresService{
     public GroupCoursesScoresResponse getGroupScoresForCourse(Integer groupId, Integer courseId) {
         List<TaskCourses> taskCourses = taskCoursesRepo.findAllByCourseId(courseId);
         List<AppUser> users = appUserRepo.findAllByGroupId(groupId);
+        List<Attempts> attempts = attemptsRepo.findAllByCourseId(courseId);
         GroupCoursesScoresResponse groupCoursesScoresResponse = new GroupCoursesScoresResponse();
 
             for(AppUser user: users) {
+                List<Attempts> userAttempts = attempts.stream().filter(a -> a.getUserId().equals(user.getId())).toList();
+                Attempts lastAttempt = userAttempts.stream().max(Comparator.comparing(v -> v.getTime().getTime())).orElse(new Attempts());
+
                 List<Scores> userScores = new ArrayList<>();
                 for(TaskCourses taskCourse: taskCourses) {
                     List<Scores> scores = scoresRepo.findAllByUserIdAndTaskId(user.getId(), taskCourse.getTaskId());
@@ -397,7 +450,7 @@ public class ScoresServiceClass implements ScoresService{
                         scores.sort(comparator);
                         userScores.add(scores.get(0));
                     } else {
-                        Scores nullScore = new Scores(user.getId(),taskCourse.getTaskId(),null,null,null, null);
+                        Scores nullScore = new Scores(user.getId(),taskCourse.getTaskId(), (Integer) null, (Integer) null, courseId, lastAttempt.getSolution());
                         userScores.add(nullScore);
                     }
                 }

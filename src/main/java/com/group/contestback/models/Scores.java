@@ -39,4 +39,13 @@ public class Scores {
         this.review = review;
         this.courseId = courseId;
     }
+    public Scores(Integer userId, Integer taskId, Integer score, Integer teacherId, Integer courseId, String solution) {
+        this.userId = userId;
+        this.taskId = taskId;
+        this.score = score;
+        this.date = new Date();
+        this.teacherId = teacherId;
+        this.solution = solution;
+        this.courseId = courseId;
+    }
 }

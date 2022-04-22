@@ -17,4 +17,5 @@ public interface AttemptsRepo extends JpaRepository<Attempts, Integer> {
                     "WHERE NOT EXISTS (SELECT t2.taskid FROM scores t2 WHERE t1.taskid = t2.taskid) and courseid = ?2",
             nativeQuery = true)
     List<Attempts> findByTaskUserMaxTime(Integer userId, Integer courseId);
+    List<Attempts> findAllByCourseId(Integer courseId);
 }
