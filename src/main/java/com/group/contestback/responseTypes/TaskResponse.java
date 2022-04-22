@@ -11,6 +11,7 @@ import java.util.List;
 @Data
 public class TaskResponse {
     private Tasks task;
+    private String deadline;
     public void addSolutionVariant(Integer id, String solution, Integer taskId) {
         this.solutionVariants.add(new SolutionVariant(id, solution, taskId));
     }

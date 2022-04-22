@@ -30,6 +30,7 @@ public class TaskServiceClass implements TaskService {
     private final GroupCoursesRepo groupCoursesRepo;
     private final AppUserRepo appUserRepo;
     private final SolutionVariantsRepo solutionVariantsRepo;
+    private final TaskDeadlinesRepo taskDeadlinesRepo;
 
     @Override
     public void addTaskType(String name) {
@@ -52,11 +53,15 @@ public class TaskServiceClass implements TaskService {
         }
     }
 
-    private void fillTasks(List<TaskResponse> taskResponses, Tasks task, TaskResponse taskResponse) {
+    private void fillTasks(List<TaskResponse> taskResponses, Tasks task, TaskResponse taskResponse, Integer courseId) {
         try {
             taskResponse.setTask(new Tasks(task.getId(), task.getName(), task.getDescription(), "", task.getTaskTypeId()));
         } catch (Exception e) {
             log.error(e.getMessage());
+        }
+        List<TaskDeadlines> tdl = taskDeadlinesRepo.findAllByTaskIdAndCourseId(task.getId(), courseId);
+        if(tdl.size() > 0) {
+            taskResponse.setDeadline(tdl.get(0).getDeadline().toString());
         }
         List<SolutionVariants> solutionVariants = solutionVariantsRepo.findAllByTaskId(task.getId());
         for (int k = 0; k < solutionVariants.size(); ++k) {
@@ -66,14 +71,14 @@ public class TaskServiceClass implements TaskService {
     }
 
     @Override
-    public List<TaskResponse> getTasks() {
-        List<TaskResponse> taskResponses = new ArrayList<>();
-        List<Tasks> tasks = tasksRepo.findAll();
-        for (Tasks task : tasks) {
-            TaskResponse taskResponse = new TaskResponse();
-            fillTasks(taskResponses, task, taskResponse);
-        }
-        return taskResponses;
+    public List<Tasks> getTasks() {
+//        List<TaskResponse> taskResponses = new ArrayList<>();
+//        List<Tasks> tasks = tasksRepo.findAll();
+//        for (Tasks task : tasks) {
+//            TaskResponse taskResponse = new TaskResponse();
+//            fillTasks(taskResponses, task, taskResponse);
+//        }
+        return tasksRepo.findAll();
     }
 
     @Override
@@ -83,7 +88,7 @@ public class TaskServiceClass implements TaskService {
         for (int i = 0; i < taskCourses.size(); ++i) {
             TaskResponse taskResponse = new TaskResponse();
             Tasks task = tasksRepo.findById(taskCourses.get(i).getTaskId()).get();
-            fillTasks(taskResponses, task, taskResponse);
+            fillTasks(taskResponses, task, taskResponse, courseId);
         }
         return taskResponses;
     }
@@ -155,6 +160,21 @@ public class TaskServiceClass implements TaskService {
             groupCoursesRepo.save(groupCourses);
         }
         return "";
+    }
+
+    @Override
+    public String getTaskDeadline(Integer taskId, Integer courseId) {
+        return taskDeadlinesRepo.findAllByTaskIdAndCourseId(taskId, courseId).get(0).getDeadline().toString();
+    }
+
+    @Override
+    public void addTaskDeadline(Integer taskId, Integer courseId, String deadline) {
+        try {
+            taskDeadlinesRepo.save(new TaskDeadlines(deadline, taskId, courseId));
+
+        } catch (Exception e) {
+            log.error(e.getMessage());
+        }
     }
 
     @Override

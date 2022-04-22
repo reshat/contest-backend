@@ -14,7 +14,7 @@ public interface TaskService {
     void addTaskType(String name);
     List<TaskTypes> getTaskTypes();
     void addTask(String name, String solution, String description, Integer taskTypeId);
-    List<TaskResponse> getTasks();
+    List<Tasks> getTasks();
     List<TaskResponse> getTasksByCourse(Integer courseId);
     List<Courses> getAllCourses();
     void addCourse(String name, Integer year);
@@ -23,5 +23,8 @@ public interface TaskService {
     void addGroup(String number, Integer year);
     List<GroupCoursesWithNames> getAllGroupCourses();
     String addGroupOnCourse(Integer courseId, Integer groupId);
+    String getTaskDeadline(Integer taskId, Integer courseId);
+    void addTaskDeadline(Integer taskId, Integer courseId, String deadline);
+
     StudentTaskResponse getStudentCourses();
 }

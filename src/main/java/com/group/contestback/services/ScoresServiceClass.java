@@ -30,6 +30,7 @@ public class ScoresServiceClass implements ScoresService{
     private final TaskCoursesRepo taskCoursesRepo;
     private final GroupsRepo groupsRepo;
     private final SolutionVariantsRepo solutionVariantsRepo;
+    private final TaskDeadlinesRepo taskDeadlinesRepo;
 
     @Value("${spring.datasource.url}")
     private String dataSourceURL;
@@ -114,14 +115,23 @@ public class ScoresServiceClass implements ScoresService{
         Tasks task = tasksRepo.findById(taskId).get();
         List<Attempts> attempts = attemptsRepo.findAllByTaskIdAndUserId(taskId,userId);
         String taskType = taskTypesRepo.getById(task.getTaskTypeId()).getName();
+        List<TaskCourses> taskCourses = taskCoursesRepo.findAllByCourseId(courseId);
+        if(!(taskCourses.size() > 0 && taskCourses.stream().anyMatch(t -> {
+            return t.getTaskId().equals(taskId);
+        }))) {
+            throw new RuntimeException("This task is not on this course");
+        }
 
         if(!(taskType.equals("SQL_TASK") || taskType.equals("MANUAL_TASK"))) {
             throw new RuntimeException("Wrong request for task type");
         }
 
-//        if((task.getDeadLine().getTime() - new Date().getTime() < 0)) {
-//            throw new RuntimeException("The deadline expired");
-//        }
+        List<TaskDeadlines> tdl = taskDeadlinesRepo.findAllByTaskIdAndCourseId(task.getId(), courseId);
+
+        if(tdl.size() > 0 && (tdl.get(0).getDeadline().getTime() - new Date().getTime() < 0)) {
+            throw new RuntimeException("The deadline expired");
+        }
+
         Comparator<Attempts> comparator = (p1, p2) -> (int) (p2.getTime().getTime() - p1.getTime().getTime());
         attempts.sort(comparator);
 
@@ -161,14 +171,22 @@ public class ScoresServiceClass implements ScoresService{
         Tasks task = tasksRepo.findById(taskId).get();
         List<Scores> scores = scoresRepo.findAllByUserIdAndTaskId(taskId,userId);
         String taskType = taskTypesRepo.getById(task.getTaskTypeId()).getName();
-
+        List<TaskCourses> taskCourses = taskCoursesRepo.findAllByCourseId(courseId);
+        if(!(taskCourses.size() > 0 && taskCourses.stream().anyMatch(t -> {
+            return t.getTaskId().equals(taskId);
+        }))) {
+            throw new RuntimeException("This task is not on this course");
+        }
         if(!(taskType.equals("SQL_TASK") || taskType.equals("MANUAL_TASK"))) {
             throw new RuntimeException("Wrong request for task type");
         }
 
-//        if((task.getDeadLine().getTime() - new Date().getTime() < 0)) {
-//            throw new RuntimeException("The deadline expired");
-//        }
+        List<TaskDeadlines> tdl = taskDeadlinesRepo.findAllByTaskIdAndCourseId(task.getId(), courseId);
+
+        if(tdl.size() > 0 && (tdl.get(0).getDeadline().getTime() - new Date().getTime() < 0)) {
+            throw new RuntimeException("The deadline expired");
+        }
+
         Comparator<Scores> comparator = (p1, p2) -> (int) (p2.getDate().getTime() - p1.getDate().getTime());
         scores.sort(comparator);
 
@@ -263,15 +281,23 @@ public class ScoresServiceClass implements ScoresService{
         Tasks task = tasksRepo.findById(taskId).get();
         List<Attempts> attempts = attemptsRepo.findAllByTaskIdAndUserId(taskId,userId);
         String taskType = taskTypesRepo.getById(task.getTaskTypeId()).getName();
+        List<TaskCourses> taskCourses = taskCoursesRepo.findAllByCourseId(courseId);
+        if(!(taskCourses.size() > 0 && taskCourses.stream().anyMatch(t -> {
+            return t.getTaskId().equals(taskId);
+        }))) {
+            throw new RuntimeException("This task is not on this course");
+        }
         if(!taskType.equals("SIMPLE_TASK")) {
             throw new RuntimeException("Wrong request for task type");
         }
         if(attempts.size() > 0) {
             throw new RuntimeException("Only 1 attempt allowed");
         }
-//        if(task.getDeadLine().getTime() - new Date().getTime() < 0) {
-//            throw new RuntimeException("The deadline expired");
-//        }
+        List<TaskDeadlines> tdl = taskDeadlinesRepo.findAllByTaskIdAndCourseId(task.getId(), courseId);
+
+        if(tdl.size() > 0 && (tdl.get(0).getDeadline().getTime() - new Date().getTime() < 0)) {
+            throw new RuntimeException("The deadline expired");
+        }
 
 
         // SIMPLE_TASK - only 1 attempt

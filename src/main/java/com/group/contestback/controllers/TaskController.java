@@ -96,6 +96,18 @@ public class TaskController {
     public ResponseEntity<?> addGroupOnCourse(@RequestBody addGroupOnCourse form) {
         return ResponseEntity.ok().body(taskService.addGroupOnCourse(form.getCourseId(), form.getGroupId()));
     }
+
+    @ApiOperation(value = "Добавляет дедлайн определенному заданию курса")
+    @PostMapping("/addTaskDeadline")
+    public ResponseEntity<?> addTaskDeadline(@RequestBody addTaskDeadline form) {
+        taskService.addTaskDeadline(form.getTaskId(), form.getCourseId(), form.getDeadline());
+        return ResponseEntity.ok().build();
+    }
+    @ApiOperation(value = "Возращает дедлайн к заданию")
+    @GetMapping("/taskDeadline")
+    public ResponseEntity<?> getTaskDeadline(@RequestBody getTaskDeadLine form) {
+        return ResponseEntity.ok().body(taskService.getTaskDeadline(form.getTaskId(), form.getCourseId()));
+    }
 }
 @Data
 class addTaskForm {
@@ -123,4 +135,15 @@ class addGroupForm {
 class addGroupOnCourse {
     private Integer courseId;
     private Integer groupId;
+}
+@Data
+class addTaskDeadline {
+    private Integer taskId;
+    private Integer courseId;
+    private String deadline;
+}
+@Data
+class getTaskDeadLine {
+    private Integer taskId;
+    private Integer courseId;
 }
