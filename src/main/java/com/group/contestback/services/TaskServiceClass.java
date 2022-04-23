@@ -11,10 +11,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -31,6 +28,7 @@ public class TaskServiceClass implements TaskService {
     private final AppUserRepo appUserRepo;
     private final SolutionVariantsRepo solutionVariantsRepo;
     private final TaskDeadlinesRepo taskDeadlinesRepo;
+    private final AttemptsRepo attemptsRepo;
 
     @Override
     public void addTaskType(String name) {
@@ -178,21 +176,40 @@ public class TaskServiceClass implements TaskService {
     }
 
     @Override
-    public StudentTaskResponse getStudentCourses() {
+    public List<StudentTaskResponse> getStudentCourses() {
         AppUser appUser = appUserRepo.findByLogin(SecurityContextHolder.getContext().getAuthentication().getPrincipal().toString());
         List<GroupCourses> groupCourses
                 = groupCoursesRepo.findAllByGroupId(appUser.getGroupId());
         List<Courses> courses = new ArrayList<>();
 
+        List<StudentTaskResponse> resp = new ArrayList<>();
+
         for (int i = 0; i < groupCourses.size(); ++i) {
+            StudentTaskResponse studentTaskResponse = new StudentTaskResponse();
+
             Courses courses1 = coursesRepo.findById(groupCourses.get(i).getCourseId()).get();
-            courses.add(courses1);
+            studentTaskResponse.setUserId(appUser.getId());
+            studentTaskResponse.setCourses(courses1);
+            List<Attempts> userAttempts = attemptsRepo.findAllByCourseIdAndUserId(courses1.getId(), appUser.getId());
+            List<TaskCourses> taskCourses = taskCoursesRepo.findAllByCourseId(courses1.getId());
+            Set<Integer> set = new HashSet<Integer> ();
+
+
+
+            for(int k = 0; k < userAttempts.size(); ++k) {
+                set.add(userAttempts.get(k).getTaskId());
+            }
+            studentTaskResponse.setCompletion(set.size()/taskCourses.size());
+
+            List<TaskDeadlines> taskDeadlines = taskDeadlinesRepo.findAllByCourseId(courses1.getId());
+            Comparator<TaskDeadlines> comparator = (p1, p2) -> (int) (p2.getDeadline().getTime() - p1.getDeadline().getTime());
+            taskDeadlines.sort(comparator);
+            if(taskDeadlines.size() > 0) {
+                studentTaskResponse.setNearestDeadline(taskDeadlines.get(0).getDeadline());
+            }
+            resp.add(studentTaskResponse);
         }
-        StudentTaskResponse studentTaskResponse = new StudentTaskResponse();
-        studentTaskResponse.setUserId(appUser.getId());
-        studentTaskResponse.setCourses(courses);
-        studentTaskResponse.setCompletion(100);// to do later
-        studentTaskResponse.setNearestDeadline(new Date()); // to do later
-        return studentTaskResponse;
+
+        return resp;
     }
 }

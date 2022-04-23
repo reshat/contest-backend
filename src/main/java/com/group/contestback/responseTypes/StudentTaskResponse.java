@@ -9,7 +9,7 @@ import java.util.List;
 @Data
 public class StudentTaskResponse {
     private Integer userId;
-    private List<Courses> courses;
+    private Courses courses;
     private Integer completion;
     private Date nearestDeadline;
 }

@@ -18,4 +18,5 @@ public interface AttemptsRepo extends JpaRepository<Attempts, Integer> {
             nativeQuery = true)
     List<Attempts> findByTaskUserMaxTime(Integer userId, Integer courseId);
     List<Attempts> findAllByCourseId(Integer courseId);
+    List<Attempts> findAllByCourseIdAndUserId(Integer courseId, Integer userId);
 }
