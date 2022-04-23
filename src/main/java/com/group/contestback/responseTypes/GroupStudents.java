@@ -1,9 +1,9 @@
 package com.group.contestback.responseTypes;
 
 import com.group.contestback.models.AppUser;
-import com.group.contestback.models.Attempts;
 import com.group.contestback.models.Groups;
 import lombok.Data;
+import org.springframework.scheduling.config.Task;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -12,16 +12,16 @@ import java.util.List;
 public class GroupStudents{
     Groups groups;
     List<UserTasks> userTasks = new ArrayList<>();
-    public void addUser(AppUser user, List<Attempts> manualAttempts) {
+    public void addUser(AppUser user, List<AttemptsTask> manualAttempts) {
         this.userTasks.add(new UserTasks(user, manualAttempts));
     }
 }
 @Data
 class UserTasks{
     AppUser user;
-    List<Attempts> manualAttempts;
+    List<AttemptsTask> manualAttempts;
 
-    public UserTasks(AppUser user, List<Attempts> manualAttempts) {
+    public UserTasks(AppUser user, List<AttemptsTask> manualAttempts) {
         this.user = user;
         this.manualAttempts = manualAttempts;
     }

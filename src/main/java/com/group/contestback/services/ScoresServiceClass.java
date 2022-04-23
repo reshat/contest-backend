@@ -477,12 +477,21 @@ public class ScoresServiceClass implements ScoresService{
             for(AppUser user: users) {
                 List<Attempts> attempts = attemptsRepo.findByTaskUserMaxTime(user.getId(), Integer.parseInt(courseId));
                 List<Attempts> manualLastAttempts = new ArrayList<>();
+                List<AttemptsTask> attemptsTasks = new ArrayList<>();
+
                 for(Attempts attempt: attempts) {
                     if(manualTasksIds.contains(attempt.getTaskId())) {
                         manualLastAttempts.add(attempt);
+                        List<Tasks> allTasks = manualTasks.stream().filter(f -> f.getId().equals(attempt.getTaskId()) ).toList();
+                        Tasks task = new Tasks();
+                        if(allTasks.size() > 0) {
+                            task = allTasks.get(0);
+                        }
+                        attemptsTasks.add(new AttemptsTask(attempt, task));
                     }
                 }
-                groupStud.addUser(user, manualLastAttempts);
+
+                groupStud.addUser(user, attemptsTasks);
             }
             groupStudents.add(groupStud);
         }
