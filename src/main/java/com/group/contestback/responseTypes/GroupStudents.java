@@ -12,16 +12,16 @@ import java.util.List;
 public class GroupStudents{
     Groups groups;
     List<UserTasks> userTasks = new ArrayList<>();
-    public void addUser(AppUser user, List<AttemptsTask> manualAttempts) {
+    public void addUser(UserPageResponse user, List<AttemptsTask> manualAttempts) {
         this.userTasks.add(new UserTasks(user, manualAttempts));
     }
 }
 @Data
 class UserTasks{
-    AppUser user;
+    UserPageResponse user;
     List<AttemptsTask> manualAttempts;
 
-    public UserTasks(AppUser user, List<AttemptsTask> manualAttempts) {
+    public UserTasks(UserPageResponse user, List<AttemptsTask> manualAttempts) {
         this.user = user;
         this.manualAttempts = manualAttempts;
     }

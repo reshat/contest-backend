@@ -466,6 +466,8 @@ public class ScoresServiceClass implements ScoresService{
         List<Groups> groups = groupsRepo.findAll();
         List<Tasks> manualTasks = tasksRepo.findAllByTaskTypeId(3);
         List<Integer> manualTasksIds = new ArrayList<>();
+        List<Roles> roleNameToId = rolesRepo.findAll();
+        List<Groups> groupNameToId = groupsRepo.findAll();
         for (Tasks task: manualTasks) {
             manualTasksIds.add(task.getId());
         }
@@ -491,7 +493,14 @@ public class ScoresServiceClass implements ScoresService{
                     }
                 }
 
-                groupStud.addUser(user, attemptsTasks);
+
+                groupStud.addUser(new UserPageResponse(user.getId(), user.getFirstName(), user.getLastName(),
+                        user.getMiddleName(), user.getLogin(), user.getEmail(), user.getRoleId(),user.getGroupId(),
+                        roleNameToId.stream().filter(role -> role.getId().equals(user.getRoleId()))
+                                .findAny()
+                                .orElse(new Roles()).getName(),
+                        groupNameToId.stream().filter(gr -> gr.getId().equals(user.getGroupId()))
+                                .findAny().orElse(new Groups()).getNumber()), attemptsTasks);
             }
             groupStudents.add(groupStud);
         }
