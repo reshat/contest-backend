@@ -7,6 +7,7 @@ import com.group.contestback.responseTypes.*;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -31,7 +32,8 @@ public class ScoresServiceClass implements ScoresService{
     private final GroupsRepo groupsRepo;
     private final SolutionVariantsRepo solutionVariantsRepo;
     private final TaskDeadlinesRepo taskDeadlinesRepo;
-
+    @Autowired
+    private EmailServiceCS emailServiceCS;
     @Value("${spring.datasource.url}")
     private String dataSourceURL;
 
@@ -54,6 +56,9 @@ public class ScoresServiceClass implements ScoresService{
         attempts.sort(comparator);
         score.setSolution(attempts.get(0).getSolution());
         scoresRepo.save(score);
+        String email = appUserRepo.findByLogin(SecurityContextHolder.getContext().getAuthentication().getPrincipal().toString()).getEmail();
+        Mails mail = new Mails(email, "Новая оценка\",\"У вас появилась новая оценка", new Date());
+        emailServiceCS.sendSimpleMessage(mail);
     }
 
     @Override
@@ -318,7 +323,6 @@ public class ScoresServiceClass implements ScoresService{
                 score = 5;
             }
             scoresRepo.save(new Scores(userId, taskId, score, 1, courseId, solution));
-
         } else {
             resultsResponse.setTimeout((scores.size() + 1)*60*1000);
         }
