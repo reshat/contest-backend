@@ -43,7 +43,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         corsConfiguration.setAllowedHeaders(List.of("Authorization", "Cache-Control", "Content-Type"));
         corsConfiguration.setAllowedOrigins(List.of("*"));
         corsConfiguration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PUT","OPTIONS","PATCH", "DELETE"));
-        corsConfiguration.setExposedHeaders(List.of("Authorization", "access_token"));
+        corsConfiguration.setExposedHeaders(List.of("Authorization", "access_token","error"));
         corsConfiguration.setAllowedOriginPatterns(List.of("*"));
 
         http.cors().configurationSource(request -> corsConfiguration);

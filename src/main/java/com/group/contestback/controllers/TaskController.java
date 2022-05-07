@@ -1,6 +1,7 @@
 package com.group.contestback.controllers;
 
 import com.group.contestback.models.AppUser;
+import com.group.contestback.models.Tasks;
 import com.group.contestback.services.AppUserService;
 import com.group.contestback.services.TaskService;
 import io.swagger.annotations.Api;
@@ -38,6 +39,12 @@ public class TaskController {
     @PostMapping("/addtask")
     public ResponseEntity<?> addTask(@RequestBody addTaskForm form) {
         taskService.addTask(form.getName(), form.getSolution(), form.getDescription(), form.getTaskTypeId());
+        return ResponseEntity.ok().build();
+    }
+    @ApiOperation(value = "Редактирование задания")
+    @PostMapping("/updateTask")
+    public ResponseEntity<?> updateTask(@RequestBody Tasks task) {
+        taskService.updateTask(task);
         return ResponseEntity.ok().build();
     }
     @ApiOperation(value = "Возращает все задания")

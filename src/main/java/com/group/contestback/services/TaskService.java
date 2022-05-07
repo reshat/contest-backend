@@ -25,6 +25,7 @@ public interface TaskService {
     String addGroupOnCourse(Integer courseId, Integer groupId);
     String getTaskDeadline(Integer taskId, Integer courseId);
     void addTaskDeadline(Integer taskId, Integer courseId, String deadline);
+    void updateTask(Tasks task);
 
     List<StudentTaskResponse> getStudentCourses();
 }
