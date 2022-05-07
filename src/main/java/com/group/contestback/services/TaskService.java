@@ -18,11 +18,11 @@ public interface TaskService {
     List<TaskResponse> getTasksByCourse(Integer courseId);
     List<Courses> getAllCourses();
     void addCourse(String name, Integer year);
-    String addTaskToCourse(Integer taskId, Integer courseId);
+    void addTaskToCourse(Integer taskId, Integer courseId);
     List<Groups> getAllGroups();
     void addGroup(String number, Integer year);
     List<GroupCoursesWithNames> getAllGroupCourses();
-    String addGroupOnCourse(Integer courseId, Integer groupId);
+    void addGroupOnCourse(Integer courseId, Integer groupId);
     String getTaskDeadline(Integer taskId, Integer courseId);
     void addTaskDeadline(Integer taskId, Integer courseId, String deadline);
     void updateTask(Tasks task);

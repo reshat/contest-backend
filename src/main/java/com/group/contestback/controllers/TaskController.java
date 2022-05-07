@@ -80,7 +80,8 @@ public class TaskController {
     @ApiOperation(value = "Добавляет задание на курс")
     @PostMapping("/addTaskToCourse")
     public ResponseEntity<?> addTaskToCourse(@RequestBody addTaskToCourseForm form) {
-        return ResponseEntity.ok().body(taskService.addTaskToCourse(form.getTaskId(), form.getCourseId()));
+        taskService.addTaskToCourse(form.getTaskId(), form.getCourseId());
+        return ResponseEntity.ok().build();
     }
     @ApiOperation(value = "Возращает все группы")
     @GetMapping("/allGroups")
@@ -101,7 +102,8 @@ public class TaskController {
     @ApiOperation(value = "Добавляет группу на курс")
     @PostMapping("/addGroupOnCourse")
     public ResponseEntity<?> addGroupOnCourse(@RequestBody addGroupOnCourse form) {
-        return ResponseEntity.ok().body(taskService.addGroupOnCourse(form.getCourseId(), form.getGroupId()));
+        taskService.addGroupOnCourse(form.getCourseId(), form.getGroupId());
+        return ResponseEntity.ok().build();
     }
 
     @ApiOperation(value = "Добавляет дедлайн определенному заданию курса")

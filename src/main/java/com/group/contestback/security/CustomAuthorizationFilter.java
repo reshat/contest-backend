@@ -79,8 +79,7 @@ public class CustomAuthorizationFilter extends OncePerRequestFilter {
                 } catch (Exception e) {
                     response.setHeader("error",e.getMessage());
                     log.error("exception: " + e.getMessage());
-
-                    response.sendError(HttpServletResponse.SC_FORBIDDEN);
+                    response.sendError(HttpServletResponse.SC_BAD_REQUEST);
                 }
             } else {
                 response.setHeader("error","no authentication provided");

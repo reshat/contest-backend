@@ -104,18 +104,20 @@ public class TaskServiceClass implements TaskService {
     }
 
     @Override
-    public String addTaskToCourse(Integer taskId, Integer courseId) {
-        Optional<Tasks> task = tasksRepo.findById(taskId);
-        Optional<Courses> course = coursesRepo.findById(courseId);
-        if (task.isEmpty()) {
-            log.error("there is no task with this id");
-        } else if (course.isEmpty()) {
-            log.error("there is no course with this id");
-        } else {
-            TaskCourses taskCourses = new TaskCourses(taskId, courseId);
-            taskCoursesRepo.save(taskCourses);
-        }
-        return "";
+    public void addTaskToCourse(Integer taskId, Integer courseId) {
+//        Optional<Tasks> task = tasksRepo.findById(taskId);
+//        Optional<Courses> course = coursesRepo.findById(courseId);
+//        if (task.isEmpty()) {
+//            log.error("there is no task with this id");
+//        } else if (course.isEmpty()) {
+//            log.error("there is no course with this id");
+//        } else {
+//            TaskCourses taskCourses = new TaskCourses(taskId, courseId);
+//            taskCoursesRepo.save(taskCourses);
+//        }
+        TaskCourses taskCourses = new TaskCourses(taskId, courseId);
+        taskCoursesRepo.save(taskCourses);
+//        return "";
     }
 
     @Override
@@ -144,20 +146,9 @@ public class TaskServiceClass implements TaskService {
     }
 
     @Override
-    public String addGroupOnCourse(Integer courseId, Integer groupId) {
-        Optional<Courses> courses = coursesRepo.findById(courseId);
-        Optional<Groups> groups = groupsRepo.findById(groupId);
-        if (courses.isEmpty()) {
-            log.error("there is no course with this id");
-            return "there is no course with this id";
-        } else if (groups.isEmpty()) {
-            log.error("there is no group with this id");
-            return "there is no group with this id";
-        } else {
-            GroupCourses groupCourses = new GroupCourses(courseId, groupId);
-            groupCoursesRepo.save(groupCourses);
-        }
-        return "";
+    public void addGroupOnCourse(Integer courseId, Integer groupId) {
+        GroupCourses groupCourses = new GroupCourses(courseId, groupId);
+        groupCoursesRepo.save(groupCourses);
     }
 
     @Override
