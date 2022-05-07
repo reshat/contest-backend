@@ -9,7 +9,7 @@ import java.util.List;
 
 public interface AppUserService {
     AppUser saveAppUser(AppUser user);
-    void addRoleToUser(String login, String roleName, String description);
+    void addRoleToUser(String login, String roleName, String description) throws Exception;
     AppUser getAppUser(String login);
     List<AppUser> getUsers();
     Page<UserPageResponse> getUsersPage(int page, int pageSize);

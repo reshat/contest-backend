@@ -46,13 +46,15 @@ public class AppUserServiceClass implements AppUserService, UserDetailsService {
     }
 
     @Override
-    public void addRoleToUser(String login, String roleName, String description) {
+    public void addRoleToUser(String login, String roleName, String description) throws Exception {
         AppUser user = userRepo.findByLogin(login);
         Roles roles = rolesRepo.findByName(roleName);
         if(user == null) {
             log.error("user not found");
+            throw new Exception("user not found");
         } else if (roles == null) {
             log.error("role not found");
+            throw new Exception("user not found");
         } else {
             user.setRoleId(roles.getId());
         }

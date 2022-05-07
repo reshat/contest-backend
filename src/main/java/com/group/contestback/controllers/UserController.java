@@ -50,8 +50,8 @@ public class UserController {
         return ResponseEntity.ok().body(userService.saveAppUser(appUser));
     }
     @ApiOperation(value = "Добавляет роль к пользователю")
-    @PostMapping("/user/addrole")
-    public ResponseEntity<?> addRoleToUser(@RequestBody RoleToUserForm form) {
+    @PostMapping("/addrole")
+    public ResponseEntity<?> addRoleToUser(@RequestBody RoleToUserForm form) throws Exception {
         userService.addRoleToUser(form.getLogin(), form.getRoleName(), form.getDescription());
         return ResponseEntity.ok().build();
     }
