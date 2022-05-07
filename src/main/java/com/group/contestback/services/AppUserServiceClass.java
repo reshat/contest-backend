@@ -37,12 +37,12 @@ public class AppUserServiceClass implements AppUserService, UserDetailsService {
     private EmailServiceCS emailServiceCS;
     @Override
     public AppUser saveAppUser(AppUser user) {
-        log.info("Save app user" + user.getPassHash());
         user.setPassHash(passwordEncoder.encode(user.getPassHash()));
-        log.info("Registering new user" + user.getLogin() + " " + user.getEmail());
+        userRepo.save(user);
+        userRepo.flush();
         Mails mails = new Mails(user.getEmail(),"Вы были успешно зарегистрированы",new Date());
         emailServiceCS.sendSimpleMessage(mails);
-        return userRepo.save(user);
+        return user;
     }
 
     @Override
@@ -128,8 +128,10 @@ public class AppUserServiceClass implements AppUserService, UserDetailsService {
         Optional<Groups> groups = groupsRepo.findById(id);
         if(user == null) {
             log.error("user not found");
+            throw new RuntimeException("user not found");
         } else if(groups.isEmpty()) {
             log.error("group not found");
+            throw new RuntimeException("group not found");
         } else {
             user.setGroupId(groups.get().getId());
         }
@@ -140,7 +142,7 @@ public class AppUserServiceClass implements AppUserService, UserDetailsService {
         AppUser user = userRepo.findByLogin(login);
         if(user == null) {
             log.error("user not found");
-            throw new UsernameNotFoundException("user not found");
+            throw new RuntimeException("user not found");
         }
         Collection<SimpleGrantedAuthority> authorities = new ArrayList<>();
         rolesRepo.findAllById(user.getRoleId()).forEach(role-> authorities.add(new SimpleGrantedAuthority(role.getName())));

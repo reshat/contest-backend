@@ -53,7 +53,13 @@ public class CustomAuthorizationFilter extends OncePerRequestFilter {
                 || Arrays.stream(tokenExceptions).anyMatch(request.getServletPath()::contains)) {
             log.info("inside exception");
             log.info(request.getServletPath());
-            filterChain.doFilter(request,response);
+            try{
+                filterChain.doFilter(request,response);
+            } catch (Exception e) {
+                response.setHeader("error",e.getMessage());
+                log.error("exception: " + e.getMessage());
+                response.sendError(HttpServletResponse.SC_BAD_REQUEST);
+            }
         } else {
 
             String authorizationHeader = request.getHeader(HttpHeaders.AUTHORIZATION);

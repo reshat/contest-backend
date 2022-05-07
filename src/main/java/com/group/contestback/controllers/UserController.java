@@ -44,7 +44,7 @@ public class UserController {
     }
     @ApiOperation(value = "Добавляет нового пользователя", notes = "Роли указывать необязательно, для этого существует другой запрос")
     @PostMapping("/user/add")
-    public ResponseEntity<AppUser> addUsers(@RequestBody UserRegistration user) {
+    public ResponseEntity<?> addUsers(@RequestBody UserRegistration user) {
         AppUser appUser = new AppUser(user.getFirstName(),user.getLastName(),user.getMiddleName(),user.getLogin(),
                 user.getPassword(), "", user.getEmail(), 2, null);
         return ResponseEntity.ok().body(userService.saveAppUser(appUser));
