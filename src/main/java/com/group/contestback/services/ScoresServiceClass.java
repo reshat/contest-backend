@@ -79,13 +79,10 @@ public class ScoresServiceClass implements ScoresService{
         props.setProperty("password",userPass);
         Connection connection = DriverManager.getConnection(dataSourceURL, props);
 
-        log.info("schema " + connection.getSchema());
-
         Statement statement = connection.createStatement();
 
 
-        log.info("SET search_path TO hiddentests; " + solution);
-        log.info(String.valueOf(statement.executeUpdate("SET search_path TO " + schema)));
+        statement.executeUpdate("SET search_path TO " + schema);
         ResultSet resultSet = statement.executeQuery(solution);
 
         ResultSetMetaData resultSetMetaData = resultSet.getMetaData();
@@ -222,7 +219,7 @@ public class ScoresServiceClass implements ScoresService{
         ResultScoreResponse resultsResponse = new ResultScoreResponse();
         Integer userId = appUserRepo.findByLogin(SecurityContextHolder.getContext().getAuthentication().getPrincipal().toString()).getId();
         Tasks task = tasksRepo.findById(taskId).get();
-        List<Scores> scores = scoresRepo.findAllByUserIdAndTaskId(taskId,userId);
+        List<Scores> scores = scoresRepo.findAllByCourseIdAndUserIdAndTaskId(courseId, userId, taskId);
         String taskType = taskTypesRepo.getById(task.getTaskTypeId()).getName();
         List<TaskCourses> taskCourses = taskCoursesRepo.findAllByCourseId(courseId);
         if(!(taskCourses.size() > 0 && taskCourses.stream().anyMatch(t -> {
@@ -407,13 +404,18 @@ public class ScoresServiceClass implements ScoresService{
 
     @Override
     public List<Scores> getGroupScoresForTask(Integer groupId, Integer taskId) {
-        List<Scores> scores = scoresRepo.findAllScoresByTaskAndGroup(groupId, taskId);
+        List<Scores> scores = scoresRepo.findAllByTaskId(taskId);
+
+        Comparator<Scores> comparator = (p1, p2) -> (int) (p2.getDate().getTime() - p1.getDate().getTime());
+        scores.sort(comparator);
         List<AppUser> users = appUserRepo.findAllByGroupId(groupId);
         List<Scores> result = new ArrayList<>();
         users.forEach(appUser -> {
             int resSize = result.size();
             scores.forEach(scores1 -> {
-                if(appUser.getId().equals(scores1.getUserId())){
+                if(appUser.getId().equals(scores1.getUserId()) && !result.stream().anyMatch(s -> {
+                    return (s.getUserId() == scores1.getUserId() && s.getCourseId() == scores1.getCourseId());
+                })){
                     result.add(scores1);
                 }
             });
@@ -426,8 +428,6 @@ public class ScoresServiceClass implements ScoresService{
 
     @Override
     public List<Attempts> getStudentAttemptsOnTask(Integer taskId) {
-        log.info(appUserRepo.findByLogin(SecurityContextHolder.getContext().getAuthentication().getPrincipal().toString()).getId().toString());
-        log.info(taskId.toString());
         return attemptsRepo.findAllByTaskIdAndUserId(taskId,appUserRepo.findByLogin(SecurityContextHolder.getContext().getAuthentication().getPrincipal().toString()).getId());
     }
 
