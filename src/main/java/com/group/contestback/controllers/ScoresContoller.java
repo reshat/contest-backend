@@ -18,6 +18,7 @@ import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.web.bind.annotation.*;
 
 import javax.persistence.Column;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -36,14 +37,10 @@ public class ScoresContoller {
     @ApiOperation(value = "Добавляет новую оценку")
     @PostMapping("/addScore")
     public ResponseEntity<?> addScore(@RequestBody ScoreForm scoreForm) {
-        try {
-            Scores score = new Scores(scoreForm.getUserId(),scoreForm.getTaskId(),
+        Scores score = new Scores(scoreForm.getUserId(),scoreForm.getTaskId(),
                     scoreForm.getScore(),scoreForm.getTeacherId(),scoreForm.getReview(), scoreForm.getCourseId());
-            scoresService.addScore(score);
-            return ResponseEntity.ok().build();
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
+        scoresService.addScore(score);
+        return ResponseEntity.ok().build();
     }
     @ApiOperation(value = "Возращает все оценки")
     @GetMapping("/allScores")
@@ -84,30 +81,18 @@ public class ScoresContoller {
 
     @ApiOperation(value = "Добавляет новую попытку на оценку")
     @PostMapping("/addSQLAttemptScore")
-    public ResponseEntity<?> addSQLAttemptScore(@RequestBody AttemptSQLForm attemptForm) {
-        try {
-            return ResponseEntity.ok().body(scoresService.checkSQLSolutionScore(attemptForm.getTaskId(), attemptForm.getCourseId(),attemptForm.getSolution()));
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().header("error", e.getMessage()).body(e.getMessage());
-        }
+    public ResponseEntity<?> addSQLAttemptScore(@RequestBody AttemptSQLForm attemptForm) throws ParseException {
+        return ResponseEntity.ok().body(scoresService.checkSQLSolutionScore(attemptForm.getTaskId(), attemptForm.getCourseId(),attemptForm.getSolution()));
     }
     @ApiOperation(value = "Добавляет новую попытку")
     @PostMapping("/addSQLAttempt")
-    public ResponseEntity<?> addSQLAttempt(@RequestBody AttemptSQLForm attemptForm) {
-        try {
-            return ResponseEntity.ok().body(scoresService.checkSQLSolution(attemptForm.getTaskId(), attemptForm.getCourseId(),attemptForm.getSolution()));
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().header("error", e.getMessage()).body(e.getMessage());
-        }
+    public ResponseEntity<?> addSQLAttempt(@RequestBody AttemptSQLForm attemptForm) throws ParseException {
+        return ResponseEntity.ok().body(scoresService.checkSQLSolution(attemptForm.getTaskId(), attemptForm.getCourseId(),attemptForm.getSolution()));
     }
     @ApiOperation(value = "Добавляет новую попытку")
     @PostMapping("/addSimpleAttempt")
     public ResponseEntity<?> addSimpleAttempt(@RequestBody AttemptSimpleForm attemptForm) {
-        try {
-            return ResponseEntity.ok().body(scoresService.checkSimpleSolution(attemptForm.getTaskId(), attemptForm.getCourseId(),attemptForm.getSolutionsId()));
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
+        return ResponseEntity.ok().body(scoresService.checkSimpleSolution(attemptForm.getTaskId(), attemptForm.getCourseId(),attemptForm.getSolutionsId()));
     }
 
     @ApiOperation(value = "Возращает все попытки")

@@ -26,14 +26,10 @@ public class CommentsController {
     @ApiOperation(value = "Добавляет новый комментарий")
     @PostMapping("/addComment")
     public ResponseEntity<?> addComment(@RequestBody CommentsForm commentsForm) {
-        try {
-            Comments comment = new Comments(commentsForm.getToTaskId(), commentsForm.getFromUserId(), commentsForm.getComment(), commentsForm.getCourseId());
-            log.info(comment.toString());
-            commentsService.addComment(comment);
-            return ResponseEntity.ok().build();
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
+        Comments comment = new Comments(commentsForm.getToTaskId(), commentsForm.getFromUserId(), commentsForm.getComment(), commentsForm.getCourseId());
+        log.info(comment.toString());
+        commentsService.addComment(comment);
+        return ResponseEntity.ok().build();
     }
     @ApiOperation(value = "Возращает все коментарии")
     @GetMapping("/allComments")
