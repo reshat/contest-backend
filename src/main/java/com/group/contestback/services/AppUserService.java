@@ -17,4 +17,5 @@ public interface AppUserService {
 
     void addEmailToUser(String login, String email);
     void setUserGroup(String login, Integer id);
+    void resetPassword(String login, String newPassword);
 }

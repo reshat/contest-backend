@@ -177,6 +177,15 @@ public class TaskServiceClass implements TaskService {
     }
 
     @Override
+    public Tasks getTask(Integer id) {
+        log.info("getting");
+        log.info(String.valueOf(id));
+        Tasks tasks = tasksRepo.getById(id);
+        log.info(tasks.getSolution());
+        return new Tasks(tasks.getId(), tasks.getName(), tasks.getDescription(),tasks.getSolution(),tasks.getTaskTypeId());
+    }
+
+    @Override
     public List<StudentTaskResponse> getStudentCourses() {
         AppUser appUser = appUserRepo.findByLogin(SecurityContextHolder.getContext().getAuthentication().getPrincipal().toString());
         List<GroupCourses> groupCourses

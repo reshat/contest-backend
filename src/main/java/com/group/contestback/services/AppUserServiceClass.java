@@ -140,6 +140,13 @@ public class AppUserServiceClass implements AppUserService, UserDetailsService {
     }
 
     @Override
+    public void resetPassword(String login, String newPassword) {
+        AppUser user = userRepo.findByLogin(login);
+        user.setPassHash(passwordEncoder.encode(newPassword));
+        userRepo.save(user);
+    }
+
+    @Override
     public UserDetails loadUserByUsername(String login) throws UsernameNotFoundException {
         AppUser user = userRepo.findByLogin(login);
         if(user == null) {

@@ -53,6 +53,11 @@ public class TaskController {
         return ResponseEntity.ok().body(taskService.getTasks());
     }
 
+    @ApiOperation(value = "Возращает задание по id")
+    @GetMapping("/get")
+    public ResponseEntity<Tasks> getTask(@RequestBody String taskId) {
+        return ResponseEntity.ok().body(taskService.getTask(Integer.parseInt(taskId)));
+    }
     @ApiOperation(value = "Возращает все задания курса")
     @GetMapping("/allTasksByCourse")
     public ResponseEntity<?> getAllTasksByCourse(@RequestBody String courseId) {

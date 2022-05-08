@@ -67,6 +67,12 @@ public class UserController {
         userService.addEmailToUser(form.getLogin(), form.getEmail());
         return ResponseEntity.ok().build();
     }
+    @ApiOperation(value = "Сброс пароля")
+    @PostMapping("/user/resetPassword")
+    public ResponseEntity<?> resetPassword(@RequestBody ResetPassword form) {
+        userService.resetPassword(form.getLogin(), form.getNewPassword());
+        return ResponseEntity.ok().build();
+    }
 }
 @Data
 class UserRegistration {
@@ -104,3 +110,9 @@ class PageSizeName {
     private Integer pageSize;
     private String str;
 }
+@Data
+class ResetPassword {
+    private String login;
+    private String newPassword;
+}
+
