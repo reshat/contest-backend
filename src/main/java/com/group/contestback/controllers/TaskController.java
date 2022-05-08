@@ -1,6 +1,5 @@
 package com.group.contestback.controllers;
 
-import com.group.contestback.models.AppUser;
 import com.group.contestback.models.Tasks;
 import com.group.contestback.services.AppUserService;
 import com.group.contestback.services.TaskService;
@@ -11,8 +10,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @Api(tags = {"Task controller"})
 @RestController

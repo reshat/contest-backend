@@ -70,12 +70,6 @@ public class TaskServiceClass implements TaskService {
 
     @Override
     public List<Tasks> getTasks() {
-//        List<TaskResponse> taskResponses = new ArrayList<>();
-//        List<Tasks> tasks = tasksRepo.findAll();
-//        for (Tasks task : tasks) {
-//            TaskResponse taskResponse = new TaskResponse();
-//            fillTasks(taskResponses, task, taskResponse);
-//        }
         return tasksRepo.findAll();
     }
 
@@ -105,19 +99,8 @@ public class TaskServiceClass implements TaskService {
 
     @Override
     public void addTaskToCourse(Integer taskId, Integer courseId) {
-//        Optional<Tasks> task = tasksRepo.findById(taskId);
-//        Optional<Courses> course = coursesRepo.findById(courseId);
-//        if (task.isEmpty()) {
-//            log.error("there is no task with this id");
-//        } else if (course.isEmpty()) {
-//            log.error("there is no course with this id");
-//        } else {
-//            TaskCourses taskCourses = new TaskCourses(taskId, courseId);
-//            taskCoursesRepo.save(taskCourses);
-//        }
         TaskCourses taskCourses = new TaskCourses(taskId, courseId);
         taskCoursesRepo.save(taskCourses);
-//        return "";
     }
 
     @Override
@@ -178,10 +161,7 @@ public class TaskServiceClass implements TaskService {
 
     @Override
     public Tasks getTask(Integer id) {
-        log.info("getting");
-        log.info(String.valueOf(id));
         Tasks tasks = tasksRepo.getById(id);
-        log.info(tasks.getSolution());
         return new Tasks(tasks.getId(), tasks.getName(), tasks.getDescription(),tasks.getSolution(),tasks.getTaskTypeId());
     }
 

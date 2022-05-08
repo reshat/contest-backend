@@ -1,8 +1,6 @@
 package com.group.contestback.controllers;
 
 import com.group.contestback.models.Comments;
-import com.group.contestback.models.Scores;
-import com.group.contestback.repositories.CommentsRepo;
 import com.group.contestback.services.CommentsService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -11,9 +9,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import javax.persistence.Column;
-import java.util.Date;
 
 @Api(tags = {"Comments controller"})
 @RestController

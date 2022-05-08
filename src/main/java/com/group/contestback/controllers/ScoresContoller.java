@@ -1,26 +1,18 @@
 package com.group.contestback.controllers;
 
-import com.group.contestback.models.Attempts;
 import com.group.contestback.models.Scores;
-import com.group.contestback.security.CustomAccessDeniedHandler;
 import com.group.contestback.services.AppUserService;
 import com.group.contestback.services.ScoresService;
 import com.group.contestback.services.TaskService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import io.swagger.models.auth.In;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.annotation.Bean;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.web.bind.annotation.*;
 
-import javax.persistence.Column;
 import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 @Api(tags = {"Scores controller"})

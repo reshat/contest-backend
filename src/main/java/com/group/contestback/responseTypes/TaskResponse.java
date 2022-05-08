@@ -1,10 +1,8 @@
 package com.group.contestback.responseTypes;
 
-import com.group.contestback.models.SolutionVariants;
 import com.group.contestback.models.Tasks;
 import lombok.Data;
 
-import javax.persistence.Column;
 import java.util.ArrayList;
 import java.util.List;
 

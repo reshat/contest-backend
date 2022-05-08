@@ -1,7 +1,4 @@
 package com.group.contestback.responseTypes;
-import com.group.contestback.models.Courses;
-import com.group.contestback.models.Groups;
-import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 

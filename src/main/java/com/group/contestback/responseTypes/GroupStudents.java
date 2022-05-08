@@ -1,9 +1,7 @@
 package com.group.contestback.responseTypes;
 
-import com.group.contestback.models.AppUser;
 import com.group.contestback.models.Groups;
 import lombok.Data;
-import org.springframework.scheduling.config.Task;
 
 import java.util.ArrayList;
 import java.util.List;

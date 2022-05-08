@@ -1,7 +1,6 @@
 package com.group.contestback.services;
 
 import com.group.contestback.models.AppUser;
-import com.group.contestback.models.Roles;
 import com.group.contestback.responseTypes.UserPageResponse;
 import org.springframework.data.domain.Page;
 

@@ -1,11 +1,7 @@
 package com.group.contestback.responseTypes;
 
-import com.group.contestback.models.AppUser;
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
-
-import javax.persistence.Column;
 
 @Data
 @AllArgsConstructor

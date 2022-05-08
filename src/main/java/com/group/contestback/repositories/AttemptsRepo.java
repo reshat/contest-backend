@@ -1,7 +1,6 @@
 package com.group.contestback.repositories;
 
 import com.group.contestback.models.Attempts;
-import com.group.contestback.models.Scores;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
