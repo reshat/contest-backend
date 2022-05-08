@@ -117,9 +117,9 @@ public class TaskController {
         return ResponseEntity.ok().build();
     }
     @ApiOperation(value = "Возращает дедлайн к заданию")
-    @GetMapping("/taskDeadline")
-    public ResponseEntity<?> getTaskDeadline(@RequestBody getTaskDeadLine form) {
-        return ResponseEntity.ok().body(taskService.getTaskDeadline(form.getTaskId(), form.getCourseId()));
+    @GetMapping("/taskDeadline/{taskId}/{courseId}")
+    public ResponseEntity<?> getTaskDeadline(@PathVariable String taskId, @PathVariable String courseId) {
+        return ResponseEntity.ok().body(taskService.getTaskDeadline(Integer.parseInt(taskId), (Integer.parseInt(courseId))));
     }
 }
 @Data

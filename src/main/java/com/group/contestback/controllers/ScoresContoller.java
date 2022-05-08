@@ -58,17 +58,10 @@ public class ScoresContoller {
         return ResponseEntity.ok().body(scoresService.getAllManualAttempts(courseId));
     }
 
-
     @ApiOperation(value = "Возращает оценки группы по заданию")
-    @GetMapping("/groupScoresForTask")
-    public ResponseEntity<?> getGroupScoresForTask(@RequestBody GroupTask groupTask) {
-        return ResponseEntity.ok().body(scoresService.getGroupScoresForTask(groupTask.getGroupId(), groupTask.getTaskId()));
-    }
-
-    @ApiOperation(value = "Возращает оценки группы по курсу")
-    @GetMapping("/groupScoresForCourse")
-    public ResponseEntity<?> getGroupScoresForTask(@RequestBody GroupCourse groupCourse) {
-        return ResponseEntity.ok().body(scoresService.getGroupScoresForCourse(groupCourse.getGroupId(), groupCourse.getCourseId()));
+    @GetMapping("/groupScoresForTask/{groupId}/{taskId}")
+    public ResponseEntity<List<Scores>> getGroupScoresForTask(@PathVariable String groupId, @PathVariable String taskId) {
+        return ResponseEntity.ok().body(scoresService.getGroupScoresForTask(Integer.parseInt(groupId), Integer.parseInt(taskId)));
     }
 
     @ApiOperation(value = "Добавляет новую попытку на оценку")

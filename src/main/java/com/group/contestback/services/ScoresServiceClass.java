@@ -408,11 +408,11 @@ public class ScoresServiceClass implements ScoresService{
 
     @Override
     public List<Scores> getGroupScoresForTask(Integer groupId, Integer taskId) {
-        List<Scores> scores = scoresRepo.findAllByTaskId(taskId);
-
+        List<Scores> scores = scoresRepo.findAllByTaskId(taskId, groupId);
         Comparator<Scores> comparator = (p1, p2) -> (int) (p2.getDate().getTime() - p1.getDate().getTime());
         scores.sort(comparator);
         List<AppUser> users = appUserRepo.findAllByGroupId(groupId);
+
         List<Scores> result = new ArrayList<>();
         users.forEach(appUser -> {
             int resSize = result.size();

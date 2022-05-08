@@ -29,14 +29,14 @@ public class UserController {
         return ResponseEntity.ok().body(userService.getUsers());
     }
     @ApiOperation(value = "Возращает определенную страницу, определенного размера пользователей")
-    @GetMapping("/usersPage")
-    public ResponseEntity<Page<UserPageResponse>> getUsersPage(@RequestBody PageSize pageSize) {
-        return ResponseEntity.ok().body(userService.getUsersPage(pageSize.getPage(), pageSize.getPageSize()));
+    @GetMapping("/usersPage/{page}/{pageSize}")
+    public ResponseEntity<Page<UserPageResponse>> getUsersPage(@PathVariable String page, @PathVariable String pageSize) {
+        return ResponseEntity.ok().body(userService.getUsersPage(Integer.parseInt(page), Integer.parseInt(pageSize)));
     }
     @ApiOperation(value = "Возращает определенную страницу, определенного размера пользователей")
-    @GetMapping("/usersPageFind")
-    public ResponseEntity<Page<UserPageResponse>> getUsersPageFind(@RequestBody PageSizeName pageSizeName) {
-        return ResponseEntity.ok().body(userService.findUsersByLastNamePage(pageSizeName.getPage(), pageSizeName.getPageSize(), pageSizeName.getStr()));
+    @GetMapping("/usersPageFind/{page}/{pageSize}/{str}")
+    public ResponseEntity<Page<UserPageResponse>> getUsersPageFind(@PathVariable String page, @PathVariable String pageSize, @PathVariable String str) {
+        return ResponseEntity.ok().body(userService.findUsersByLastNamePage(Integer.parseInt(page), Integer.parseInt(pageSize), str));
     }
     @ApiOperation(value = "Добавляет нового пользователя", notes = "Роли указывать необязательно, для этого существует другой запрос")
     @PostMapping("/user/add")

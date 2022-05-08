@@ -15,6 +15,6 @@ public interface ScoresRepo extends JpaRepository<Scores, Integer>{
                     "join Users U on Scores.userId = U.id where groupId = ?1" +
                     " and taskId = ?2",
             nativeQuery = true)
-    List<Scores> findAllByTaskId(Integer taskId);
+    List<Scores> findAllByTaskId(Integer taskId, Integer groupId);
     List<Scores> findAllByCourseIdAndUserIdAndTaskId(Integer courseId, Integer userId, Integer taskId);
 }
