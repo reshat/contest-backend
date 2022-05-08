@@ -47,14 +47,14 @@ public class ScoresContoller {
     }
 
     @ApiOperation(value = "Возращает попытки студента к заданию")
-    @GetMapping("/studentAttempts")
-    public ResponseEntity<?> getStudentAttempts(@RequestBody String taskId) {
+    @GetMapping("/studentAttempts/{taskId}")
+    public ResponseEntity<?> getStudentAttempts(@PathVariable String taskId) {
         return ResponseEntity.ok().body(scoresService.getStudentAttemptsOnTask(Integer.parseInt(taskId)));
     }
 
     @ApiOperation(value = "Возращает по группам непроверяемые попытки")
-    @GetMapping("/allManualAttempts")
-    public ResponseEntity<?> getAllManualAttempts(@RequestBody String courseId) {
+    @GetMapping("/allManualAttempts/{courseId}")
+    public ResponseEntity<?> getAllManualAttempts(@PathVariable String courseId) {
         return ResponseEntity.ok().body(scoresService.getAllManualAttempts(courseId));
     }
 

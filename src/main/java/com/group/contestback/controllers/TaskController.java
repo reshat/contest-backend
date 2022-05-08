@@ -22,8 +22,8 @@ public class TaskController {
     private final TaskService taskService;
 
     @ApiOperation(value = "Добавляет новый тип заданий")
-    @PostMapping("/addtasktype")
-    public ResponseEntity<?> addTaskType(@RequestBody String name) {
+    @PostMapping("/addtasktype/{name}")
+    public ResponseEntity<?> addTaskType(@PathVariable String name) {
         taskService.addTaskType(name);
         return ResponseEntity.ok().build();
     }
@@ -51,13 +51,15 @@ public class TaskController {
     }
 
     @ApiOperation(value = "Возращает задание по id")
-    @GetMapping("/get")
-    public ResponseEntity<Tasks> getTask(@RequestBody String taskId) {
+    @GetMapping("/get/{taskId}")
+    public ResponseEntity<Tasks> getTask(@PathVariable String taskId) {
         return ResponseEntity.ok().body(taskService.getTask(Integer.parseInt(taskId)));
     }
     @ApiOperation(value = "Возращает все задания курса")
-    @GetMapping("/allTasksByCourse")
-    public ResponseEntity<?> getAllTasksByCourse(@RequestBody String courseId) {
+    @GetMapping("/allTasksByCourse/{courseId}")
+    public ResponseEntity<?> getAllTasksByCourse(@PathVariable String courseId) {
+        log.info(courseId);
+        log.info("Hey you");
         return ResponseEntity.ok().body(taskService.getTasksByCourse(Integer.parseInt(courseId)));
     }
 

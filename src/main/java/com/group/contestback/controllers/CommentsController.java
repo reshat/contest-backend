@@ -32,13 +32,13 @@ public class CommentsController {
         return ResponseEntity.ok().body(commentsService.getAllComments());
     }
     @ApiOperation(value = "Возращает все коментарии к заданию")
-    @GetMapping("/getCommentsToTask")
-    public ResponseEntity<?> getAllCommentsToTask(@RequestBody String toTaskId) {
+    @GetMapping("/getCommentsToTask/{toTaskId}")
+    public ResponseEntity<?> getAllCommentsToTask(@PathVariable String toTaskId) {
         return ResponseEntity.ok().body(commentsService.getCommentsToTask(Integer.parseInt(toTaskId)));
     }
     @ApiOperation(value = "Удаление комментария")
-    @PostMapping("/removeComment")
-    public ResponseEntity<?> removeComment(@RequestBody String commentId) {
+    @PostMapping("/removeComment/{commentId}")
+    public ResponseEntity<?> removeComment(@PathVariable String commentId) {
         commentsService.removeComment(Integer.parseInt(commentId));
         return ResponseEntity.ok().build();
     }
