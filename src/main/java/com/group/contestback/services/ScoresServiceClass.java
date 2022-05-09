@@ -32,6 +32,8 @@ public class ScoresServiceClass implements ScoresService{
     private final GroupsRepo groupsRepo;
     private final SolutionVariantsRepo solutionVariantsRepo;
     private final TaskDeadlinesRepo taskDeadlinesRepo;
+    private final CoursesRepo coursesRepo;
+
     @Autowired
     private EmailServiceCS emailServiceCS;
     @Value("${spring.datasource.url}")
@@ -388,7 +390,8 @@ public class ScoresServiceClass implements ScoresService{
     }
 
     @Override
-    public List<Scores> getStudentScores() {
+    public List<ScoresResponse> getStudentScores() {
+        List<ScoresResponse> response = new ArrayList<>();
         List<Scores> allScores = scoresRepo.findAllByUserId(appUserRepo.findByLogin(SecurityContextHolder.getContext().getAuthentication().getPrincipal().toString()).getId());
         List<Scores> lastScores = new ArrayList<>();
         for (Scores scores : allScores) {
@@ -401,9 +404,20 @@ public class ScoresServiceClass implements ScoresService{
                 }
             }
             lastScores.add(scores);
-
         }
-        return lastScores;
+        for(Scores score: lastScores) {
+            ScoresResponse sr = new ScoresResponse();
+            sr.setScore(score);
+            Tasks task = tasksRepo.findById(score.getTaskId()).get();
+            sr.setTask(new Tasks(task.getId(), task.getName(), task.getDescription(), "", task.getTaskTypeId()));
+            sr.setCourse(coursesRepo.findById(score.getCourseId()).get());
+            AppUser teacher = appUserRepo.findById(score.getTeacherId()).get();
+            sr.setTeacherName(teacher.getFirstName());
+            sr.setTeacherLastName(teacher.getLastName());
+            sr.setTeacherMiddleName(teacher.getMiddleName());
+            response.add(sr);
+        }
+        return response;
     }
 
     @Override

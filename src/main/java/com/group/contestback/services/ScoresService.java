@@ -2,10 +2,7 @@ package com.group.contestback.services;
 
 import com.group.contestback.models.Attempts;
 import com.group.contestback.models.Scores;
-import com.group.contestback.responseTypes.GroupCoursesScoresResponse;
-import com.group.contestback.responseTypes.GroupStudents;
-import com.group.contestback.responseTypes.ResultScoreResponse;
-import com.group.contestback.responseTypes.ResultsResponse;
+import com.group.contestback.responseTypes.*;
 
 import java.text.ParseException;
 import java.util.List;
@@ -18,7 +15,7 @@ public interface ScoresService {
     ResultsResponse checkSQLSolution(Integer taskId, Integer courseId, String solution) throws ParseException;
     ResultScoreResponse checkSQLSolutionScore(Integer taskId, Integer courseId, String solution) throws ParseException;
     Integer checkSimpleSolution(Integer taskId, Integer courseId, List<Integer> solutionsId);
-    List<Scores> getStudentScores();
+    List<ScoresResponse> getStudentScores();
     List<Scores> getGroupScoresForTask(Integer groupId, Integer taskId);
     List<Attempts> getStudentAttemptsOnTask(Integer taskId);
     GroupCoursesScoresResponse getGroupScoresForCourse(Integer groupId, Integer taskId);
