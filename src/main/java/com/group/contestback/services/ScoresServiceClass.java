@@ -324,7 +324,7 @@ public class ScoresServiceClass implements ScoresService{
             if(noHiddenTestError && noOpenTestsError) {
                 score = 5;
             }
-            scoresRepo.save(new Scores(userId, taskId, score, 1, courseId, solution));
+            scoresRepo.save(new Scores(userId, taskId, score, null, courseId, solution));
         } else {
             resultsResponse.setTimeout((scores.size() + 1)*60*1000);
         }
