@@ -384,7 +384,7 @@ public class ScoresServiceClass implements ScoresService{
         }
         Attempts attempt = new Attempts(userId, taskId, result == 5, solutionsId.toString(), courseId);
         attemptsRepo.save(attempt);
-        Scores score = new Scores(userId, taskId, result, 1, solutionsId.toString(), courseId);
+        Scores score = new Scores(userId, taskId, result, null, courseId, solutionsId.toString());
         scoresRepo.save(score);
         return result;
     }
@@ -411,10 +411,13 @@ public class ScoresServiceClass implements ScoresService{
             Tasks task = tasksRepo.findById(score.getTaskId()).get();
             sr.setTask(new Tasks(task.getId(), task.getName(), task.getDescription(), "", task.getTaskTypeId()));
             sr.setCourse(coursesRepo.findById(score.getCourseId()).get());
-            AppUser teacher = appUserRepo.findById(score.getTeacherId()).get();
-            sr.setTeacherName(teacher.getFirstName());
-            sr.setTeacherLastName(teacher.getLastName());
-            sr.setTeacherMiddleName(teacher.getMiddleName());
+            if(score.getTeacherId() != null) {
+                AppUser teacher = appUserRepo.findById(score.getTeacherId()).get();
+                sr.setTeacherName(teacher.getFirstName());
+                sr.setTeacherLastName(teacher.getLastName());
+                sr.setTeacherMiddleName(teacher.getMiddleName());
+            }
+
             response.add(sr);
         }
         return response;
