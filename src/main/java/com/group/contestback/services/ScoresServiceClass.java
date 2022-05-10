@@ -426,14 +426,14 @@ public class ScoresServiceClass implements ScoresService{
     @Override
     public List<ScoresUser> getGroupScoresForTask(Integer groupId, Integer taskId) {
         List<ScoresUser> response = new ArrayList<>();
-        List<Scores> scores = scoresRepo.findAllByTaskId(taskId, groupId);
+        List<Scores> scores = scoresRepo.findAllByTaskId(taskId);
+
         Comparator<Scores> comparator = (p1, p2) -> (int) (p2.getDate().getTime() - p1.getDate().getTime());
         scores.sort(comparator);
         List<AppUser> users = appUserRepo.findAllByGroupId(groupId);
         List<Roles> roleNameToId = rolesRepo.findAll();
         List<Groups> groupNameToId = groupsRepo.findAll();
 
-        List<Scores> result = new ArrayList<>();
         users.forEach(appUser -> {
             if(rolesRepo.getById(appUser.getRoleId()).getName().equals("ROLE_USER")) {
                 ScoresUser su = new ScoresUser();
@@ -444,18 +444,14 @@ public class ScoresServiceClass implements ScoresService{
                                 .orElse(new Roles()).getName(),
                         groupNameToId.stream().filter(gr -> gr.getId().equals(appUser.getGroupId()))
                                 .findAny().orElse(new Groups()).getNumber()));
-                int resSize = result.size();
                 scores.forEach(scores1 -> {
-                    if(appUser.getId().equals(scores1.getUserId()) && !result.stream().anyMatch(s -> {
-                        return (s.getUserId() == scores1.getUserId() && s.getCourseId() == scores1.getCourseId());
-                    })){
-                        su.setScores(scores1);
-//                    result.add(scores1);
+                    if(appUser.getId().equals(scores1.getUserId()) && !su.getScores().stream().anyMatch(s ->
+                            (s.getUserId().equals(scores1.getUserId()) && s.getCourseId().equals(scores1.getCourseId()) ))){
+                        su.getScores().add(scores1);
                     }
                 });
-                if(resSize == result.size() && rolesRepo.getById(appUser.getRoleId()).getName().equals("ROLE_USER")){
-                    su.setScores(new Scores(null,appUser.getId(),taskId,null,null,null,null,null, null));
-//                result.add(new Scores(null,appUser.getId(),taskId,null,null,null,null,null, null));
+                if(su.getScores().size() == 0 && rolesRepo.getById(appUser.getRoleId()).getName().equals("ROLE_USER")){
+                    su.getScores().add(new Scores(null,appUser.getId(),taskId,null,null,null,null,null, null));
                 }
                 response.add(su);
             }
