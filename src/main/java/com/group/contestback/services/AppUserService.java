@@ -13,6 +13,7 @@ public interface AppUserService {
     List<AppUser> getUsers();
     Page<UserPageResponse> getUsersPage(int page, int pageSize);
     Page<UserPageResponse> findUsersByLastNamePage(int page, int pageSize, String str);
+    UserPageResponse getUserInfo();
 
     void addEmailToUser(String login, String email);
     void setUserGroup(String login, Integer id);

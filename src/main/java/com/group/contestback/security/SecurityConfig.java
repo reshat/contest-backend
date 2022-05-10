@@ -55,6 +55,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 "/webjars/**",
                 "/api/user/add").permitAll();
         http.authorizeRequests().antMatchers(HttpMethod.GET,"/api/users/**").hasAnyAuthority("ROLE_ADMIN");
+        http.authorizeRequests().antMatchers(HttpMethod.GET,"/api/userInfo/**").hasAnyAuthority("ROLE_USER", "ROLE_ADMIN");
+
         http.authorizeRequests().antMatchers(HttpMethod.GET,"/score/studentScores/**").hasAnyAuthority("ROLE_USER", "ROLE_ADMIN");
         http.authorizeRequests().antMatchers(HttpMethod.GET,"/score/studentAttempts/**").hasAnyAuthority("ROLE_USER", "ROLE_ADMIN");
         http.authorizeRequests().antMatchers(HttpMethod.POST,"/score/addSQLAttempt/**").hasAnyAuthority("ROLE_USER", "ROLE_ADMIN");

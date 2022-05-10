@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -111,6 +112,21 @@ public class AppUserServiceClass implements AppUserService, UserDetailsService {
             }
         });
         return dtoPage;
+    }
+
+    @Override
+    public UserPageResponse getUserInfo() {
+        List<Roles> roleNameToId = rolesRepo.findAll();
+        List<Groups> groupNameToId = groupsRepo.findAll();
+        AppUser appUser = userRepo.findByLogin(SecurityContextHolder.getContext().getAuthentication().getPrincipal().toString());
+//        return new UserPageResponse(appUser.getId(), appUser.getFirstName(), appUser.getLastName(), appUser.getMiddleName(), appUser.getLogin(), appUser.getEmail(), appUser.getRoleId(), appUser.getGroupId()
+        return  (new UserPageResponse(appUser.getId(), appUser.getFirstName(), appUser.getLastName()
+                , appUser.getMiddleName(), appUser.getLogin(), appUser.getEmail(), appUser.getRoleId(),appUser.getGroupId(),
+                roleNameToId.stream().filter(role -> role.getId().equals(appUser.getRoleId()))
+                        .findAny()
+                        .orElse(new Roles()).getName(),
+                groupNameToId.stream().filter(gr -> gr.getId().equals(appUser.getGroupId()))
+                        .findAny().orElse(new Groups()).getNumber())) ;
     }
 
     @Override

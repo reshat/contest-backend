@@ -28,6 +28,11 @@ public class UserController {
     public ResponseEntity<List<AppUser>> getUsers() {
         return ResponseEntity.ok().body(userService.getUsers());
     }
+    @ApiOperation(value = "Возращает информацию пользователя")
+    @GetMapping("/userInfo")
+    public ResponseEntity<?> getUserInfo() {
+        return ResponseEntity.ok().body(userService.getUserInfo());
+    }
     @ApiOperation(value = "Возращает определенную страницу, определенного размера пользователей")
     @GetMapping("/usersPage/{page}/{pageSize}")
     public ResponseEntity<Page<UserPageResponse>> getUsersPage(@PathVariable String page, @PathVariable String pageSize) {
