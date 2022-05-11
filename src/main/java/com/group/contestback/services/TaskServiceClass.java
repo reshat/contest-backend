@@ -160,9 +160,24 @@ public class TaskServiceClass implements TaskService {
     }
 
     @Override
-    public Tasks getTask(Integer id) {
-        Tasks tasks = tasksRepo.getById(id);
-        return new Tasks(tasks.getId(), tasks.getName(), tasks.getDescription(),tasks.getSolution(),tasks.getTaskTypeId());
+    public TaskResponse getTask(Integer taskId, Integer courseId) {
+        Tasks task = tasksRepo.getById(taskId);
+        TaskResponse taskResponse = new TaskResponse();
+        List<TaskCourses> taskCourses = taskCoursesRepo.findAllByCourseId(courseId);
+        try {
+            taskResponse.setTask(new Tasks(task.getId(), task.getName(), task.getDescription(), "", task.getTaskTypeId()));
+        } catch (Exception e) {
+            log.error(e.getMessage());
+        }
+        List<TaskDeadlines> tdl = taskDeadlinesRepo.findAllByTaskIdAndCourseId(task.getId(), courseId);
+        if(tdl.size() > 0) {
+            taskResponse.setDeadline(tdl.get(0).getDeadline().toString());
+        }
+        List<SolutionVariants> solutionVariants = solutionVariantsRepo.findAllByTaskId(task.getId());
+        for (int k = 0; k < solutionVariants.size(); ++k) {
+            taskResponse.addSolutionVariant(solutionVariants.get(k).getId(), solutionVariants.get(k).getSolution(), solutionVariants.get(k).getTaskId());
+        }
+        return taskResponse;
     }
 
     @Override

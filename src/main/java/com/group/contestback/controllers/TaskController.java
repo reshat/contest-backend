@@ -51,15 +51,13 @@ public class TaskController {
     }
 
     @ApiOperation(value = "Возращает задание по id")
-    @GetMapping("/get/{taskId}")
-    public ResponseEntity<Tasks> getTask(@PathVariable String taskId) {
-        return ResponseEntity.ok().body(taskService.getTask(Integer.parseInt(taskId)));
+    @GetMapping("/get/{taskId}/{courseId}")
+    public ResponseEntity<?> getTask(@PathVariable String taskId, @PathVariable String courseId)  {
+        return ResponseEntity.ok().body(taskService.getTask(Integer.parseInt(taskId), Integer.parseInt(courseId)));
     }
     @ApiOperation(value = "Возращает все задания курса")
     @GetMapping("/allTasksByCourse/{courseId}")
     public ResponseEntity<?> getAllTasksByCourse(@PathVariable String courseId) {
-        log.info(courseId);
-        log.info("Hey you");
         return ResponseEntity.ok().body(taskService.getTasksByCourse(Integer.parseInt(courseId)));
     }
 
