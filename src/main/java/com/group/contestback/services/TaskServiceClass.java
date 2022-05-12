@@ -199,13 +199,13 @@ public class TaskServiceClass implements TaskService {
         Tasks task = tasksRepo.getById(taskId);
         TaskResponse taskResponse = new TaskResponse();
         try {
-            taskResponse.setTask(new Tasks(task.getId(), task.getName(), task.getDescription(), "", task.getTaskTypeId()));
+            taskResponse.setTask(new Tasks(task.getId(), task.getName(), task.getDescription(), task.getSolution(), task.getTaskTypeId()));
         } catch (Exception e) {
             log.error(e.getMessage());
         }
         List<SolutionVariants> solutionVariants = solutionVariantsRepo.findAllByTaskId(task.getId());
         for (int k = 0; k < solutionVariants.size(); ++k) {
-            taskResponse.addSolutionVariant(solutionVariants.get(k).getId(), solutionVariants.get(k).getSolution(), solutionVariants.get(k).getTaskId());
+            taskResponse.addSolutionVariant(solutionVariants.get(k).getId(), solutionVariants.get(k).getSolution(), solutionVariants.get(k).getTaskId(), solutionVariants.get(k).getIsAnswer());
         }
         return taskResponse;
     }
