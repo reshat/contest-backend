@@ -27,6 +27,7 @@ public interface TaskService {
     void addTaskDeadline(Integer taskId, Integer courseId, String deadline);
     void updateTask(Tasks task);
     TaskResponse getTask(Integer taskId, Integer courseId);
+    TaskResponse getTask(Integer taskId);
 
     List<StudentTaskResponse> getStudentCourses();
 }
