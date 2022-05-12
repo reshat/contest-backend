@@ -117,14 +117,29 @@ public class TaskServiceClass implements TaskService {
     @Override
     public List<GroupCoursesWithNames> getAllGroupCourses() {
         List<GroupCoursesWithNames> groupCoursesWithNames = new ArrayList<>();
-        groupCoursesRepo.findAll().forEach(groupCourses -> groupCoursesWithNames.add(new GroupCoursesWithNames(
-                        groupCourses.getId()
-                        , coursesRepo.getById(groupCourses.getCourseId()).getName(),
-                        groupCourses.getCourseId(),
-                        groupsRepo.getById(groupCourses.getGroupId()).getNumber(),
-                        groupCourses.getGroupId()
-                ))
-        );
+        List<Groups> allGroups = groupsRepo.findAll();
+//        groupCoursesRepo.findAll().forEach(groupCourses -> groupCoursesWithNames.add(new GroupCoursesWithNames(
+//                        groupCourses.getId()
+//                        , coursesRepo.getById(groupCourses.getCourseId()).getName(),
+//                        groupCourses.getCourseId(),
+//                        groupsRepo.getById(groupCourses.getGroupId()).getNumber(),
+//                        groupCourses.getGroupId()
+//                ))
+//        );
+        allGroups.forEach(group -> {
+            GroupCoursesWithNames gwn = new GroupCoursesWithNames();
+            gwn.setGroupId(group.getId());
+            Groups group1 = groupsRepo.getById(group.getId());
+            gwn.setGroupName(group1.getNumber());
+            gwn.setGroupYear(group1.getYear());
+            List<Courses> courses = new ArrayList<>();
+            groupCoursesRepo.findAllByGroupId(group.getId()).forEach(groupCourses -> {
+                Courses course = coursesRepo.findById(groupCourses.getCourseId()).get();
+                courses.add(new Courses(course.getId(), course.getName(), course.getYear()));
+            });
+            gwn.setCourses(courses);
+            groupCoursesWithNames.add(gwn);
+        });
         return groupCoursesWithNames;
     }
 
