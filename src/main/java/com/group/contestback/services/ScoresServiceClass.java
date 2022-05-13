@@ -107,7 +107,11 @@ public class ScoresServiceClass implements ScoresService{
         while (resultSet.next()) {
             List<String> resRow = new ArrayList<>();
             for (int i = 1; i <= columnCount; i++) {
-                resRow.add(resultSet.getObject(i).toString());
+                if(resultSet.getObject(i) == null) {
+                    resRow.add(null);
+                } else {
+                    resRow.add(resultSet.getObject(i).toString());
+                }
             }
             result.add(resRow);
         }
@@ -116,8 +120,40 @@ public class ScoresServiceClass implements ScoresService{
         return result;
     }
 
+    private Boolean equalWithoutOrder(List<List<String>> studentResults, List<List<String>> teacherResults) {
+        if(studentResults.size() != teacherResults.size()) {
+            return false;
+        }
+
+        for(int i = 0; i < studentResults.size(); ++i){
+            int k = 0;
+            int ii = 0;
+            int kk = 0;
+            while (true) {
+                if((studentResults.get(i).get(ii) == null && teacherResults.get(k).get(kk) == null) || studentResults.get(i).get(ii).equals(teacherResults.get(k).get(kk))){
+                    if( ii + 1 < studentResults.get(i).size()) {
+                        kk++;
+                        ii++;
+                    } else  {
+                        teacherResults.remove(k); // removing line that already found
+                        break;
+                    }
+                } else {
+                    k++;
+                    if(k > teacherResults.size()) {
+                        return false;
+                    }
+                    ii = 0;
+                    kk = 0;
+                }
+            }
+        }
+        return  true;
+    }
+
     @Override
     public ResultsResponse checkSQLSolution(Integer taskId, Integer courseId, String solution) {
+        log.info("checking solution");
         ResultsResponse resultsResponse = new ResultsResponse();
         Integer userId = appUserRepo.findByLogin(SecurityContextHolder.getContext().getAuthentication().getPrincipal().toString()).getId();
         Tasks task = tasksRepo.findById(taskId).get();
@@ -163,7 +199,7 @@ public class ScoresServiceClass implements ScoresService{
                     succeded = false;
                 }
 
-                if(!studentResults.equals(teacherResults)) {
+                if(!equalWithoutOrder(studentResults, teacherResults)) {
                     succeded = false;
                 }
 
@@ -183,13 +219,10 @@ public class ScoresServiceClass implements ScoresService{
                 List<List<String>> studentResults = runSQLQueryUser(solution, "opentests");
                 List<List<String>> teacherResults = runSQLQueryUser(tasksRepo.findById(taskId).get().getSolution(), "opentests");
 
-                if(studentResults.size() != teacherResults.size()) {
+                if(!equalWithoutOrder(studentResults, teacherResults)) {
                     noOpenTestsError = false;
                 }
 
-                if(!studentResults.equals(teacherResults)) {
-                    noOpenTestsError = false;
-                }
             } catch (Exception e) {
                 log.error(e.getMessage());
                 noOpenTestsError = false;
@@ -197,11 +230,7 @@ public class ScoresServiceClass implements ScoresService{
             try {
                 List<List<String>> studentResults = runSQLQueryUser(solution, "hiddenTests");
                 List<List<String>> teacherResults = runSQLQueryUser(tasksRepo.findById(taskId).get().getSolution(), "hiddenTests");
-                if(studentResults.size() != teacherResults.size()) {
-                    noHiddenTestError = false;
-                }
-
-                if(!studentResults.equals(teacherResults)) {
+                if(!equalWithoutOrder(studentResults, teacherResults)) {
                     noHiddenTestError = false;
                 }
             } catch (Exception e) {
@@ -268,11 +297,7 @@ public class ScoresServiceClass implements ScoresService{
                 List<List<String>> studentResults = runSQLQueryUser(solution, "opentests");
                 List<List<String>> teacherResults = runSQLQueryUser(tasksRepo.findById(taskId).get().getSolution(), "opentests");
 
-                if(studentResults.size() != teacherResults.size()) {
-                    noOpenTestsError = false;
-                }
-
-                if(!studentResults.equals(teacherResults)) {
+                if(!equalWithoutOrder(studentResults, teacherResults)) {
                     noOpenTestsError = false;
                 }
                 Result result = new Result("Open test",noOpenTestsError);
@@ -290,11 +315,7 @@ public class ScoresServiceClass implements ScoresService{
                 List<List<String>> studentResults = runSQLQueryUser(solution, "hiddenTests");
                 List<List<String>> teacherResults = runSQLQueryUser(tasksRepo.findById(taskId).get().getSolution(), "hiddenTests");
 
-                if(studentResults.size() != teacherResults.size()) {
-                    noHiddenTestError = false;
-                }
-
-                if(!studentResults.equals(teacherResults)) {
+                if(!equalWithoutOrder(studentResults, teacherResults)) {
                     noHiddenTestError = false;
                 }
 
