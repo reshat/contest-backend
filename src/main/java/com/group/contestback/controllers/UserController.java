@@ -25,7 +25,7 @@ public class UserController {
 
     @ApiOperation(value = "Возращает всех пользователей")
     @GetMapping("/users")
-    public ResponseEntity<List<AppUser>> getUsers() {
+    public ResponseEntity<?> getUsers() {
         return ResponseEntity.ok().body(userService.getUsers());
     }
     @ApiOperation(value = "Возращает информацию пользователя")

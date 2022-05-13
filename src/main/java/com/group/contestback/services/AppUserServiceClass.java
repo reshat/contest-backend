@@ -66,8 +66,21 @@ public class AppUserServiceClass implements AppUserService, UserDetailsService {
     }
 
     @Override
-    public List<AppUser> getUsers() {
-        return userRepo.findAll();
+    public List<UserPageResponse> getUsers() {
+        List<AppUser> users = userRepo.findAll();
+        List<Roles> roleNameToId = rolesRepo.findAll();
+        List<Groups> groupNameToId = groupsRepo.findAll();
+        List<UserPageResponse> usersToSend = new ArrayList<>();
+        for(AppUser appUser: users) {
+            usersToSend.add((new UserPageResponse(appUser.getId(), appUser.getFirstName(), appUser.getLastName()
+                    , appUser.getMiddleName(), appUser.getLogin(), appUser.getEmail(), appUser.getRoleId(),appUser.getGroupId(),
+                    roleNameToId.stream().filter(role -> role.getId().equals(appUser.getRoleId()))
+                            .findAny()
+                            .orElse(new Roles()).getName(),
+                    groupNameToId.stream().filter(gr -> gr.getId().equals(appUser.getGroupId()))
+                            .findAny().orElse(new Groups()).getNumber())));
+        }
+        return usersToSend;
     }
 
     @Override

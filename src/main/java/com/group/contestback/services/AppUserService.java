@@ -10,7 +10,7 @@ public interface AppUserService {
     AppUser saveAppUser(AppUser user);
     void addRoleToUser(String login, String roleName, String description) throws Exception;
     AppUser getAppUser(String login);
-    List<AppUser> getUsers();
+    List<UserPageResponse> getUsers();
     Page<UserPageResponse> getUsersPage(int page, int pageSize);
     Page<UserPageResponse> findUsersByLastNamePage(int page, int pageSize, String str);
     UserPageResponse getUserInfo();
