@@ -27,6 +27,12 @@ public class TaskController {
         taskService.addTaskType(name);
         return ResponseEntity.ok().build();
     }
+    @ApiOperation(value = "Добавляет вариант решения к задания")
+    @PostMapping("/addsolutionVariant")
+    public ResponseEntity<?> addTaskType(@RequestBody addSolutionVariant form) {
+        taskService.addSolutionVariant(form.getSolution(),form.getIsAnswer(), form.getTaskId());
+        return ResponseEntity.ok().build();
+    }
     @ApiOperation(value = "Возращает все типы заданий")
     @GetMapping("/taskTypes")
     public ResponseEntity<?> getTaskTypes() {
@@ -131,6 +137,12 @@ class addTaskForm {
     private String solution;
     private String description;
     private Integer taskTypeId;
+}
+@Data
+class addSolutionVariant {
+    private String solution;
+    private Boolean isAnswer;
+    private Integer taskId;
 }
 @Data
 class addCourseForm {

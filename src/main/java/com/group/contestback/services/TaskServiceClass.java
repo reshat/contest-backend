@@ -37,6 +37,11 @@ public class TaskServiceClass implements TaskService {
     }
 
     @Override
+    public void addSolutionVariant(String solution, Boolean isAnswer, Integer taskId) {
+        solutionVariantsRepo.save(new SolutionVariants(solution, isAnswer, taskId));
+    }
+
+    @Override
     public List<TaskTypes> getTaskTypes() {
         return taskTypesRepo.findAll();
     }

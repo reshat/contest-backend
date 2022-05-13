@@ -12,6 +12,7 @@ import java.util.List;
 
 public interface TaskService {
     void addTaskType(String name);
+    void addSolutionVariant(String solution, Boolean isAnswer, Integer taskId);
     List<TaskTypes> getTaskTypes();
     void addTask(String name, String solution, String description, Integer taskTypeId);
     List<Tasks> getTasks();

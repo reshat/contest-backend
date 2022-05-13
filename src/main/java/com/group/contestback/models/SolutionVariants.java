@@ -18,4 +18,10 @@ public class SolutionVariants {
     private Boolean isAnswer;
     @Column(name="taskid")
     private Integer taskId;
+
+    public SolutionVariants(String solution, Boolean isAnswer, Integer taskId) {
+        this.solution = solution;
+        this.isAnswer = isAnswer;
+        this.taskId = taskId;
+    }
 }
