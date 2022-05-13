@@ -52,18 +52,24 @@ public class ScoresServiceClass implements ScoresService{
     private String closedSchema;
 
     @Override
-    public void addScore(Scores score) {
-        List<Attempts> attempts = attemptsRepo.findAllByTaskIdAndUserId(score.getTaskId(),score.getUserId());
+    public void addScore(Integer userId, Integer taskId, Integer courseId, Integer score, String review) {
+
+        List<Attempts> attempts = attemptsRepo.findAllByTaskIdAndUserId(taskId,userId);
         Comparator<Attempts> comparator = (p1, p2) -> (int) (p2.getTime().getTime() - p1.getTime().getTime());
         attempts.sort(comparator);
-        score.setSolution(attempts.get(0).getSolution());
-        scoresRepo.save(score);
+        AppUser appUser = appUserRepo.findByLogin(SecurityContextHolder.getContext().getAuthentication().getPrincipal().toString());
+
+        Scores scores = new Scores(userId, taskId, score, appUser.getId(), review, courseId);
+        scores.setSolution(attempts.get(0).getSolution());
+
+        scoresRepo.save(scores);
         String email = appUserRepo.findByLogin(SecurityContextHolder.getContext().getAuthentication().getPrincipal().toString()).getEmail();
         Mails mail = new Mails(email, "Новая оценка\",\"У вас появилась новая оценка", new Date());
         emailServiceCS.sendSimpleMessage(mail);
     }
 
-    @Override
+
+        @Override
     public List<Scores> getAllScores() {
         return scoresRepo.findAll();
     }

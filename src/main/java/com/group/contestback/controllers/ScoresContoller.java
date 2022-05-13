@@ -29,11 +29,11 @@ public class ScoresContoller {
     @ApiOperation(value = "Добавляет новую оценку")
     @PostMapping("/addScore")
     public ResponseEntity<?> addScore(@RequestBody ScoreForm scoreForm) {
-        Scores score = new Scores(scoreForm.getUserId(),scoreForm.getTaskId(),
-                    scoreForm.getScore(),scoreForm.getTeacherId(),scoreForm.getReview(), scoreForm.getCourseId());
-        scoresService.addScore(score);
+        scoresService.addScore(scoreForm.getUserId(),scoreForm.getTaskId(),
+                scoreForm.getCourseId(),scoreForm.getScore(), scoreForm.getReview());
         return ResponseEntity.ok().build();
     }
+
     @ApiOperation(value = "Возращает все оценки")
     @GetMapping("/allScores")
     public ResponseEntity<?> getAllScores() {
@@ -97,7 +97,6 @@ class ScoreForm {
     private Integer userId;
     private Integer taskId;
     private Integer score;
-    private Integer teacherId;
     private String review;
     private Integer courseId;
 }

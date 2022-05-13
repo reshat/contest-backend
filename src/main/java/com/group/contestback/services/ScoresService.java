@@ -8,7 +8,7 @@ import java.text.ParseException;
 import java.util.List;
 
 public interface ScoresService {
-    void addScore(Scores score);
+    void addScore(Integer userId, Integer taskId, Integer courseId, Integer score, String review);
     List<Scores> getAllScores();
     void addAttempt(Attempts attempt);
     List<Attempts> getAllAttempts();
