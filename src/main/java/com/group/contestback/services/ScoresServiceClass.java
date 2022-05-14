@@ -107,6 +107,7 @@ public class ScoresServiceClass implements ScoresService{
 
         for (int i = 1; i <= columnCount; ++i) {
             columnNameRow.add(resultSetMetaData.getColumnName(i));
+//            log.info(resultSetMetaData.getColumnName(i) + " " + i);
         }
         result.add(columnNameRow);
 
@@ -121,6 +122,9 @@ public class ScoresServiceClass implements ScoresService{
             }
             result.add(resRow);
         }
+//        result.forEach(r ->
+//                r.forEach(rr -> log.info(rr))
+//                );
         statement.close();
         connection.close();
         return result;
@@ -130,16 +134,38 @@ public class ScoresServiceClass implements ScoresService{
         if(studentResults.size() != teacherResults.size()) {
             return false;
         }
+        //mapping student columns to teacher columns
+        ArrayList<Integer> mapStudentToTeacher = new ArrayList<>();
+        if(studentResults.size() > 0) {
+            if(studentResults.get(0).size() > 0) {
+                for(int i = 0; i < studentResults.get(0).size(); ++i) {
+                    for(int k = 0; k < studentResults.get(0).size(); ++k) {
+                        if(studentResults.get(0).get(i).equals(teacherResults.get(0).get(k))) {
+                            mapStudentToTeacher.add(k);
+                        }
+                    }
+                }
+            } else {
+                return false;
+            }
+        } else {
+            return true;
+        }
+        if(mapStudentToTeacher.size() < studentResults.get(0).size()) {
+            return false;
+        }
+
+
 
         for(int i = 0; i < studentResults.size(); ++i){
             int k = 0;
             int ii = 0;
-            int kk = 0;
+            int kk = mapStudentToTeacher.get(ii);
             while (true) {
                 if((studentResults.get(i).get(ii) == null && teacherResults.get(k).get(kk) == null) || studentResults.get(i).get(ii).equals(teacherResults.get(k).get(kk))){
                     if( ii + 1 < studentResults.get(i).size()) {
-                        kk++;
                         ii++;
+                        kk = mapStudentToTeacher.get(ii);
                     } else  {
                         teacherResults.remove(k); // removing line that already found
                         break;
@@ -150,7 +176,7 @@ public class ScoresServiceClass implements ScoresService{
                         return false;
                     }
                     ii = 0;
-                    kk = 0;
+                    kk = mapStudentToTeacher.get(ii);
                 }
             }
         }
@@ -162,10 +188,13 @@ public class ScoresServiceClass implements ScoresService{
         log.info("checking solution");
         ResultsResponse resultsResponse = new ResultsResponse();
         Integer userId = appUserRepo.findByLogin(SecurityContextHolder.getContext().getAuthentication().getPrincipal().toString()).getId();
+        AppUser user = appUserRepo.findByLogin(SecurityContextHolder.getContext().getAuthentication().getPrincipal().toString());
+
         Tasks task = tasksRepo.findById(taskId).get();
         List<Attempts> attempts = attemptsRepo.findAllByTaskIdAndUserId(taskId,userId);
         String taskType = taskTypesRepo.getById(task.getTaskTypeId()).getName();
         List<TaskCourses> taskCourses = taskCoursesRepo.findAllByCourseId(courseId);
+
         if(!(taskCourses.size() > 0 && taskCourses.stream().anyMatch(t -> {
             return t.getTaskId().equals(taskId);
         }))) {
@@ -186,7 +215,7 @@ public class ScoresServiceClass implements ScoresService{
         attempts.sort(comparator);
 
 
-        if(attempts.size() > 0 && (new Date().getTime() - attempts.get(0).getTime().getTime() < attempts.size() *60*1000)) {
+        if(attempts.size() > 0 && (new Date().getTime() - attempts.get(0).getTime().getTime() < attempts.size() *60*1000) && user.getRoleId() != 1) {
             resultsResponse.setTimeout((int) (attempts.size()*60*1000 - (new Date().getTime() - attempts.get(0).getTime().getTime())));
             return resultsResponse;
         }
@@ -259,6 +288,8 @@ public class ScoresServiceClass implements ScoresService{
     @Override
     public ResultScoreResponse checkSQLSolutionScore(Integer taskId, Integer courseId, String solution) {
         ResultScoreResponse resultsResponse = new ResultScoreResponse();
+        AppUser user = appUserRepo.findByLogin(SecurityContextHolder.getContext().getAuthentication().getPrincipal().toString());
+
         Integer userId = appUserRepo.findByLogin(SecurityContextHolder.getContext().getAuthentication().getPrincipal().toString()).getId();
         Tasks task = tasksRepo.findById(taskId).get();
         List<Scores> scores = scoresRepo.findAllByCourseIdAndUserIdAndTaskId(courseId, userId, taskId);
@@ -283,7 +314,7 @@ public class ScoresServiceClass implements ScoresService{
         scores.sort(comparator);
 
 
-        if(scores.size() > 0 && (new Date().getTime() - scores.get(0).getDate().getTime() < scores.size() *60*1000)) {
+        if(scores.size() > 0 && (new Date().getTime() - scores.get(0).getDate().getTime() < scores.size() *60*1000) && user.getRoleId() != 1) {
             resultsResponse.setTimeout((int) (scores.size()*60*1000 - (new Date().getTime() - scores.get(0).getDate().getTime())));
             return resultsResponse;
         }
