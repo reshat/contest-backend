@@ -43,7 +43,9 @@ public class Scores {
         this.userId = userId;
         this.taskId = taskId;
         this.score = score;
-        this.date = new Date();
+        if(solution != null){
+            this.date = new Date();
+        }
         this.teacherId = teacherId;
         this.solution = solution;
         this.courseId = courseId;

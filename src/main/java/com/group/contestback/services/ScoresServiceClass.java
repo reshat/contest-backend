@@ -275,6 +275,8 @@ public class ScoresServiceClass implements ScoresService{
 
             if(noHiddenTestError && noOpenTestsError) {
                 succeded = true;
+            } else {
+                succeded = false;
             }
             resultsResponse.setTimeout((attempts.size() + 1)*60*1000);
         }
@@ -530,15 +532,22 @@ public class ScoresServiceClass implements ScoresService{
         GroupCoursesScoresResponse groupCoursesScoresResponse = new GroupCoursesScoresResponse();
 
             for(AppUser user: users) {
-                List<Attempts> userAttempts = attempts.stream().filter(a -> a.getUserId().equals(user.getId())).toList();
-                Attempts lastAttempt = userAttempts.stream().max(Comparator.comparing(v -> v.getTime().getTime())).orElse(new Attempts());
+
 
                 List<Scores> userScores = new ArrayList<>();
                 for(TaskCourses taskCourse: taskCourses) {
+                    List<Attempts> userAttempts = attempts.stream().filter(a -> a.getUserId().equals(user.getId())
+                            && a.getTaskId().equals(taskCourse.getTaskId()) && a.getCourseId().equals(taskCourse.getCourseId())).toList();
+                    Attempts lastAttempt = userAttempts.stream().max(Comparator.comparing(v -> v.getTime().getTime())).orElse(new Attempts());
+
                     List<Scores> scores = scoresRepo.findAllByUserIdAndTaskId(user.getId(), taskCourse.getTaskId());
                     if(scores.size() > 0){
                         Comparator<Scores> comparator = (p1, p2) -> (int) (p2.getDate().getTime() - p1.getDate().getTime());
                         scores.sort(comparator);
+                        log.info("adding");
+                        log.info(String.valueOf(scores.get(0).getUserId()));
+                        log.info(String.valueOf(scores.get(0).getTaskId()));
+
                         userScores.add(scores.get(0));
                     } else {
                         Scores nullScore = new Scores(user.getId(),taskCourse.getTaskId(), (Integer) null, (Integer) null, courseId, lastAttempt.getSolution());
