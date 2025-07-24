@@ -50,6 +50,7 @@ public class AppUserServiceClass implements AppUserService, UserDetailsService {
         AppUser user = userRepo.findByLogin(login);
         Roles roles = rolesRepo.findByName(roleName);
         if(user == null) {
+            // test
             log.error("user not found");
             throw new Exception("user not found");
         } else if (roles == null) {
@@ -65,6 +66,7 @@ public class AppUserServiceClass implements AppUserService, UserDetailsService {
         return userRepo.findByLogin(login);
     }
 
+    //test
     @Override
     public List<UserPageResponse> getUsers() {
         List<AppUser> users = userRepo.findAll();
